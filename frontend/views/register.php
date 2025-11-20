@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Registration - CICS Attendance System</title>
+  <!-- CSS Variables -->
+  <link rel="stylesheet" href="../assets/css/base/variables.css">
+  <!-- Component Styles -->
+  <link rel="stylesheet" href="../assets/css/components/forms.css">
+  <link rel="stylesheet" href="../assets/css/components/buttons.css">
+  <link rel="stylesheet" href="../assets/css/components/modals.css">
+  <link rel="stylesheet" href="../assets/css/components/toast.css">
+  <!-- Page Styles -->
+  <link rel="stylesheet" href="../assets/css/pages/auth.css">
   <link rel="stylesheet" href="../assets/css/main.css">
 </head>
 <body>

@@ -26,27 +26,21 @@ class AuthController {
     public function login() {
         $data = json_decode(file_get_contents('php://input'), true);
         
-        // Validate input
+        // Validate input - removed role requirement, backend determines role from database
         $errors = Validator::validate($data, [
-            'email' => 'required|email',
-            'password' => 'required|min:8',
-            'role' => 'required|in:student,instructor,admin'
+            'email' => 'required',  // Can be email or student ID
+            'password' => 'required'  // Removed min length check for login
         ]);
         
         if (!empty($errors)) {
             Response::validationError($errors);
         }
         
-        // Find user
-        $user = $this->userModel->findByEmail($data['email']);
+        // Find user by email or student ID
+        $user = $this->userModel->findByEmailOrStudentId($data['email']);
         
         if (!$user) {
             Response::error('Invalid credentials', null, 401);
-        }
-        
-        // Check role
-        if ($user['role'] !== $data['role']) {
-            Response::error('Invalid role for this account', null, 403);
         }
         
         // Check status

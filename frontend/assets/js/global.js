@@ -222,10 +222,19 @@ class FormValidator {
 
   static showError(field, message) {
     field.classList.add('error');
+
+    // Get the form-group container
+    const formGroup = field.closest('.form-group') || field.parentElement;
+
+    // Remove ALL existing error messages in this form-group to prevent stacking
+    const existingErrors = formGroup.querySelectorAll('.form-error');
+    existingErrors.forEach(error => error.remove());
+
+    // Create and add new error message
     const errorDiv = document.createElement('div');
     errorDiv.className = 'form-error';
     errorDiv.textContent = message;
-    field.parentElement.appendChild(errorDiv);
+    formGroup.appendChild(errorDiv);
   }
 
   static init() {
@@ -252,7 +261,7 @@ function initPasswordToggle() {
       if (input) {
         const isPassword = input.type === 'password';
         input.type = isPassword ? 'text' : 'password';
-        
+
         const icon = toggle.querySelector('svg');
         if (icon) {
           if (isPassword) {

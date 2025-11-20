@@ -88,11 +88,37 @@ body.login-page {
 
 /* Form error messages */
 .form-error {
-  display: block;
-  margin-top: 0.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
   font-size: 0.75rem;
-  color: #6b7280;
+  color: #ef4444;
+  background-color: #fee2e2;
+  border-left: 3px solid #ef4444;
+  border-radius: 0.25rem;
   line-height: 1.4;
+  animation: slideDown 0.2s ease-out;
+}
+
+.form-error::before {
+  content: '⚠';
+  font-size: 1rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .form-input.error {
@@ -301,15 +327,15 @@ body.login-page {
     max-width: 100%;
     margin: 0;
   }
-  
+
   .auth-header {
     padding: 2rem 1.5rem 1rem;
   }
-  
+
   .auth-body {
     padding: 1.5rem;
   }
-  
+
   .auth-logo {
     width: 3.5rem;
     height: 3.5rem;

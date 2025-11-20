@@ -4,8 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - CICS Attendance System</title>
+  <!-- CSS Variables -->
+  <link rel="stylesheet" href="../assets/css/base/variables.css">
+  <!-- Component Styles -->
+  <link rel="stylesheet" href="../assets/css/components/forms.css">
+  <link rel="stylesheet" href="../assets/css/components/buttons.css">
+  <link rel="stylesheet" href="../assets/css/components/toast.css">
+  <!-- Page Styles -->
+  <link rel="stylesheet" href="../assets/css/pages/auth.css">
+  <link rel="stylesheet" href="../assets/css/pages/login-animations.css">
   <link rel="stylesheet" href="../assets/css/main.css">
-  <link rel="stylesheet" href="../assets/css/pages/login.css">
 </head>
 <body class="login-page">
   <div class="auth-container">
@@ -21,19 +29,11 @@
         <form class="auth-form" id="loginForm" method="POST" action="#">
           <div class="form-group">
             <label for="email" class="form-label required">Email/Student ID</label>
-            <div class="input-group input-group-email">
-              <svg class="input-group-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-              </svg>
-              <input type="text" name="email" id="email" class="form-input" placeholder="Enter your email or student ID" required>
-            </div>
+            <input type="text" name="email" id="email" class="form-input" placeholder="Enter your email or student ID" required>
           </div>
           <div class="form-group">
             <label for="password" class="form-label required">Password</label>
-            <div class="input-group input-group-password">
-              <svg class="input-group-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-              </svg>
+            <div class="input-group">
               <input type="password" name="password" id="password" class="form-input" placeholder="Enter your password" required>
               <button type="button" class="password-toggle" aria-label="Toggle password visibility">
                 <svg class="eye-icon-show" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -48,25 +48,29 @@
           </div>
           <button type="submit" class="btn btn-primary btn-block">Login</button>
         </form>
-        <div class="mt-3 text-center">
-          <a href="#" class="text-sm forgot-password-link">Forgot Password?</a>
+        
+        <div class="mt-4 text-center">
+          <a href="#" class="forgot-password-link">Forgot Password?</a>
         </div>
+        
         <div class="mt-2 text-center">
-          <p class="text-sm" style="color: #4b5563;">
+          <p class="text-sm text-gray-600">
             Don't have an account? <a href="register.php" class="create-account-link">Create Account</a>
           </p>
         </div>
       </div>
-    </div>
-    <div class="auth-footer">
-      <p>
-        © 2025 Zamboanga Peninsula Polytechnic State University<br>
-        <a href="mailto:support@zppsu.edu.ph">support@zppsu.edu.ph</a>
-      </p>
+      <div class="auth-footer">
+        <p>
+          © 2025 Zamboanga Peninsula Polytechnic State University<br>
+          <a href="mailto:support@zppsu.edu.ph">support@zppsu.edu.ph</a>
+        </p>
+      </div>
     </div>
   </div>
 
   <script src="../assets/js/global.js"></script>
+  <script src="../assets/js/login-animations.js"></script>
+  <script src="../assets/js/auth.js"></script>
   <script>
     // Custom password toggle for login page
     document.addEventListener('DOMContentLoaded', function() {
@@ -155,15 +159,63 @@
       };
     });
 
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      if (FormValidator.validate(this)) {
-        // Simulate login - replace with actual API call
-        Toast.success('Login successful! Redirecting...', 'Success');
-        setTimeout(() => {
-          // Role will be determined by backend based on user credentials
-          window.location.href = 'student/dashboard.php';
-        }, 1500);
+      
+      // Validate form first
+      if (!FormValidator.validate(this)) {
+        return;
+      }
+
+      // Get form values
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      // Disable submit button to prevent double submission
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Logging in...';
+
+      try {
+        // Call backend API to authenticate against database
+        const result = await AuthAPI.login(email, password);
+
+        if (result.success && result.data) {
+          const userData = result.data;
+          
+          // Show success message
+          Toast.success('Login successful! Redirecting...', 'Success');
+          
+          // Wait a moment for the toast to show, then redirect based on role
+          setTimeout(() => {
+            AuthAPI.redirectToDashboard(userData.role);
+          }, 1000);
+        } else {
+          Toast.error('Login failed. Please try again.', 'Error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      } catch (error) {
+        // Handle authentication errors
+        let errorMessage = error.message || 'An error occurred during login';
+        
+        // Display user-friendly error messages
+        if (errorMessage.includes('Invalid email') || errorMessage.includes('Invalid credentials')) {
+          errorMessage = 'Invalid email/student ID or password. Please check your credentials.';
+        } else if (errorMessage.includes('not active') || errorMessage.includes('pending')) {
+          errorMessage = 'Your account is pending approval. Please wait for admin approval.';
+        } else if (errorMessage.includes('Device not registered')) {
+          errorMessage = 'Please use your registered device to log in.';
+        } else if (errorMessage.includes('Failed to fetch') || errorMessage.includes('Network')) {
+          errorMessage = 'Unable to connect to server. Please check your connection.';
+        }
+        
+        Toast.error(errorMessage, 'Login Failed');
+        
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
       }
     });
   </script>

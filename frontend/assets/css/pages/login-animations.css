@@ -1,0 +1,208 @@
+/* Login Page Animations and Modern Styling */
+
+/* Keyframe Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Main container with gradient background */
+.login-page .auth-container {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8c 50%, #1e3a5f 100%);
+    animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Card animation */
+.login-page .auth-card {
+    animation: scaleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s backwards;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Header with subtle gradient */
+.login-page .auth-header {
+    background: linear-gradient(to right, #f8f9fa 0%, #ffffff 100%);
+    animation: fadeIn 0.6s ease-out 0.3s backwards;
+}
+
+/* Logos animation */
+.login-page .auth-logos {
+    animation: fadeIn 0.6s ease-out 0.3s backwards;
+}
+
+/* Title animation */
+.login-page .auth-title {
+    animation: fadeInUp 0.5s ease-out 0.4s backwards;
+}
+
+/* Form elements staggered animation */
+.login-page .form-group:nth-child(1) {
+    animation: fadeInUp 0.5s ease-out 0.5s backwards;
+}
+
+.login-page .form-group:nth-child(2) {
+    animation: fadeInUp 0.5s ease-out 0.6s backwards;
+}
+
+.login-page .btn-primary {
+    animation: fadeInUp 0.5s ease-out 0.7s backwards;
+}
+
+.login-page .forgot-password-link,
+.login-page .create-account-section {
+    animation: fadeIn 0.5s ease-out 0.8s backwards;
+}
+
+.login-page .auth-footer {
+    animation: fadeIn 0.5s ease-out 0.9s backwards;
+}
+
+/* Input focus animations - NO DOUBLE BORDER */
+.login-page .form-input {
+    transition: all 0.2s ease;
+    border-width: 2px;
+    border-color: #e5e7eb;
+    outline: none !important;
+}
+
+.login-page .form-input:focus {
+    transform: scale(1.01);
+    border-color: #2d5a8c !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Fix password input padding - no left icon, only right toggle */
+.login-page .input-group .form-input {
+    padding-left: 1rem !important;
+    padding-right: 2.5rem !important;
+}
+
+/* Button animations */
+.login-page .btn-primary {
+    background: linear-gradient(135deg, #2d5a8c 0%, #1e3a5f 100%);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    font-weight: 600;
+}
+
+.login-page .btn-primary:hover {
+    background: linear-gradient(135deg, #1e3a5f 0%, #14294a 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+.login-page .btn-primary:active {
+    transform: scale(0.98) translateY(0);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+/* Password toggle smooth transition */
+.login-page .password-toggle {
+    transition: all 0.2s ease;
+    color: #9ca3af;
+}
+
+.login-page .password-toggle:hover {
+    color: #2d5a8c;
+    transform: scale(1.1);
+}
+
+/* Link hover effects */
+.login-page .forgot-password-link {
+    display: block;
+    font-size: 0.875rem;
+    color: #2d5a8c;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.login-page .forgot-password-link:hover {
+    color: #1e3a5f;
+}
+
+.login-page .create-account-link {
+    color: #2d5a8c;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.login-page .create-account-link:hover {
+    color: #1e3a5f;
+}
+
+/* Footer subtle gradient */
+.login-page .auth-footer {
+    background: linear-gradient(to right, #f8f9fa 0%, #ffffff 100%);
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Form label styling */
+.login-page .form-label {
+    font-weight: 600;
+    color: #1e3a5f;
+    font-size: 0.875rem;
+}
+
+/* Utility classes */
+.login-page .mt-4 {
+    margin-top: 1.5rem;
+}
+
+.login-page .mt-2 {
+    margin-top: 0.5rem;
+}
+
+.login-page .text-gray-600 {
+    color: #4b5563;
+}
+
+.login-page .text-sm {
+    font-size: 0.875rem;
+}
+
+/* Smooth transitions for all interactive elements */
+.login-page a,
+.login-page button,
+.login-page input {
+    transition: all 0.2s ease;
+}
+
+/* Remove ALL default focus outlines */
+.login-page *:focus {
+    outline: none !important;
+}
+
+.login-page *:focus-visible {
+    outline: none !important;
+}

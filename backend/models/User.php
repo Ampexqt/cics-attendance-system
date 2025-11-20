@@ -34,6 +34,20 @@ class User {
         return $this->db->fetchOne($sql, [':email' => $email]);
     }
     
+    public function findByEmailOrStudentId($emailOrStudentId) {
+        // First try to find by email
+        $user = $this->findByEmail($emailOrStudentId);
+        if ($user) {
+            return $user;
+        }
+        
+        // If not found by email, try to find by student ID
+        $sql = "SELECT u.* FROM users u 
+                JOIN students s ON u.id = s.user_id 
+                WHERE s.student_id = :student_id LIMIT 1";
+        return $this->db->fetchOne($sql, [':student_id' => $emailOrStudentId]);
+    }
+    
     public function findById($id) {
         $sql = "SELECT * FROM users WHERE id = :id LIMIT 1";
         return $this->db->fetchOne($sql, [':id' => $id]);
