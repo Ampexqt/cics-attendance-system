@@ -90,7 +90,12 @@ class AuthController
         }
 
         // Get user details based on role
-        $userData = ['id' => $user['id'], 'email' => $user['email'], 'role' => $user['role']];
+        $userData = [
+            'id' => $user['id'], 
+            'email' => $user['email'], 
+            'role' => $user['role'],
+            'device_fingerprint' => $user['device_fingerprint'] ?? null
+        ];
 
         if ($user['role'] === 'student') {
             $student = $this->studentModel->findByUserId($user['id']);

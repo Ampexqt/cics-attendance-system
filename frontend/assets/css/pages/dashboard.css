@@ -362,18 +362,171 @@
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .attendance-summary {
     flex-direction: column;
   }
-  
+
   .filter-group {
     flex-direction: column;
   }
-  
+
   .pagination {
     flex-direction: column;
     gap: var(--spacing-md);
   }
 }
 
+/* Attendance Logs Page */
+.logs-filters {
+  display: flex;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-lg);
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.filter-group svg {
+  color: var(--text-secondary);
+}
+
+.filter-label {
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.filter-value {
+  font-size: var(--font-size-base);
+  color: var(--primary-blue);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: color var(--transition-base);
+}
+
+.filter-value:hover {
+  color: var(--primary-blue-dark);
+  text-decoration: underline;
+}
+
+.logs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.log-item {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-base);
+}
+
+.log-item:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-blue-lighter);
+}
+
+.log-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-sm);
+  gap: var(--spacing-md);
+}
+
+.log-item-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+  flex: 1;
+}
+
+.log-item-details {
+  margin-bottom: var(--spacing-sm);
+}
+
+.log-time {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+.log-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.log-instructor {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.log-date {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+/* Status Badges for Logs */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.status-badge svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.status-badge.present {
+  background-color: var(--success-green-light);
+  color: var(--success-green);
+}
+
+.status-badge.late {
+  background-color: var(--warning-orange-light);
+  color: var(--warning-orange);
+}
+
+.status-badge.absent {
+  background-color: var(--error-red-light);
+  color: var(--error-red);
+}
+
+/* Responsive Logs Page */
+@media (max-width: 768px) {
+  .logs-filters {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .log-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .log-item-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

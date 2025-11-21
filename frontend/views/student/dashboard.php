@@ -1,11 +1,37 @@
+<?php
+/**
+ * Student Dashboard
+ * CICS Attendance System
+ */
+
+// Start session and check authentication
+require_once __DIR__ . '/../../../auth_check.php';
+require_role('student');
+
+// Get user data from session
+$userData = $_SESSION['user_data'] ?? null;
+$studentName = 'Student';
+$studentId = '';
+$program = '';
+$section = '';
+
+if ($userData) {
+    $studentName = ($userData['first_name'] ?? '') . ' ' . ($userData['last_name'] ?? '');
+    $studentId = $userData['student_id'] ?? '';
+    $program = $userData['program'] ?? '';
+    $section = $userData['section'] ?? '';
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Dashboard - CICS Attendance System</title>
   <link rel="stylesheet" href="../../assets/css/main.css">
 </head>
+
 <body>
   <div class="main-layout">
     <!-- Sidebar -->
@@ -49,8 +75,8 @@
     <main class="main-content">
       <div class="main-header">
         <div>
-          <h1 class="main-header-title">Welcome, John Doe</h1>
-          <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">BSIT-ADT • <span style="color: var(--accent-gold);">●</span> Registered Device Active</p>
+          <h1 class="main-header-title">Welcome, <?php echo htmlspecialchars($studentName); ?></h1>
+          <p style="color: var(--text-secondary); font-size: var(--font-size-sm);"><?php echo htmlspecialchars($program . ($section ? ' • ' . $section : '')); ?> • <span style="color: var(--accent-gold);">●</span> Registered Device Active</p>
         </div>
         <div class="main-header-actions">
           <button class="btn btn-icon" title="Notifications">
@@ -103,18 +129,9 @@
               </h3>
             </div>
             <div class="card-body">
-              <div class="schedule-list">
-                <div class="schedule-item">
-                  <div class="schedule-time">8:00 AM - 9:30 AM</div>
-                  <div class="schedule-course active">ADT 101 - Drafting Fundamentals</div>
-                </div>
-                <div class="schedule-item">
-                  <div class="schedule-time">10:00 AM - 11:30 AM</div>
-                  <div class="schedule-course">ADT 102 - Architectural CAD</div>
-                </div>
-                <div class="schedule-item">
-                  <div class="schedule-time">1:00 PM - 2:30 PM</div>
-                  <div class="schedule-course">ADT 103 - Design Theory</div>
+              <div class="schedule-list" id="scheduleList">
+                <div class="schedule-item" style="text-align: center; padding: var(--spacing-md); color: var(--text-secondary);">
+                  Loading schedule...
                 </div>
               </div>
             </div>
@@ -135,18 +152,18 @@
                 <div class="summary-chart">
                   <svg viewBox="0 0 100 100">
                     <circle class="summary-chart-circle summary-chart-bg" cx="50" cy="50" r="36"></circle>
-                    <circle class="summary-chart-circle summary-chart-progress" cx="50" cy="50" r="36" style="--progress: 90;"></circle>
+                    <circle class="summary-chart-circle summary-chart-progress" cx="50" cy="50" r="36" id="summaryProgress" style="--progress: 0;"></circle>
                   </svg>
-                  <div class="summary-chart-text">90%</div>
+                  <div class="summary-chart-text" id="summaryPercentage">0%</div>
                 </div>
                 <div class="summary-stats">
                   <div class="summary-stat">
                     <span class="summary-stat-label">Absences:</span>
-                    <strong>3</strong>
+                    <strong id="summaryAbsences">0</strong>
                   </div>
                   <div class="summary-stat">
                     <span class="summary-stat-label">Late:</span>
-                    <strong>1</strong>
+                    <strong id="summaryLate">0</strong>
                   </div>
                   <a href="logs.php" style="color: var(--primary-blue); font-size: var(--font-size-sm); margin-top: var(--spacing-sm); display: inline-block;">
                     View Full Logs →
@@ -166,32 +183,142 @@
                 Correction Requests
               </h3>
             </div>
-            <div class="card-body">
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-md); background-color: var(--bg-secondary); border-radius: var(--radius-md); margin-bottom: var(--spacing-sm);">
-                <div>
-                  <div style="font-weight: var(--font-weight-medium); color: var(--text-primary);">System Error</div>
-                  <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">Oct 15, 2025</div>
-                </div>
-                <span class="status-badge active">Approved</span>
+            <div class="card-body" id="recentRequestsCard">
+              <div style="text-align: center; padding: var(--spacing-md); color: var(--text-secondary);">
+                Loading requests...
               </div>
-              <a href="requests.php" class="btn btn-outline btn-block" style="margin-top: var(--spacing-md);">View All Requests</a>
             </div>
           </div>
         </div>
       </div>
     </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+      <a href="dashboard.php" class="mobile-nav-item active">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+        </svg>
+        <span>Home</span>
+      </a>
+      <a href="logs.php" class="mobile-nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+        </svg>
+        <span>Logs</span>
+      </a>
+      <a href="requests.php" class="mobile-nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+        </svg>
+        <span>Requests</span>
+      </a>
+      <a href="profile.php" class="mobile-nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+        </svg>
+        <span>Profile</span>
+      </a>
+    </nav>
   </div>
 
   <script src="../../assets/js/global.js"></script>
+  <script src="../../assets/js/auth.js"></script>
   <script>
-    document.getElementById('attendanceBtn').addEventListener('click', function() {
-      // Simulate attendance marking
+    // Check authentication on page load
+    if (!AuthAPI.isAuthenticated()) {
+      window.location.href = '/cics-attendance-system/login.php';
+    }
+
+    // Load dashboard data
+    async function loadDashboardData() {
+      try {
+        // Load attendance summary
+        const summaryResponse = await fetch('/cics-attendance-system/backend/api/attendance/summary', {
+          credentials: 'include'
+        });
+        
+        if (summaryResponse.ok) {
+          const summaryData = await summaryResponse.json();
+          if (summaryData.success && summaryData.data) {
+            const stats = summaryData.data;
+            const total = stats.total_sessions || 0;
+            const present = stats.present || 0;
+            const absent = stats.absent || 0;
+            const late = stats.late || 0;
+            
+            // Calculate percentage
+            const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
+            document.getElementById('summaryPercentage').textContent = percentage + '%';
+            document.getElementById('summaryProgress').style.setProperty('--progress', percentage);
+            document.getElementById('summaryAbsences').textContent = absent;
+            document.getElementById('summaryLate').textContent = late;
+          }
+        }
+
+        // Load recent requests (if API exists)
+        // For now, show empty state or link to requests page
+        const requestsCard = document.getElementById('recentRequestsCard');
+        requestsCard.innerHTML = `
+          <div style="text-align: center; padding: var(--spacing-md); color: var(--text-secondary);">
+            No recent requests
+          </div>
+          <a href="requests.php" class="btn btn-outline btn-block" style="margin-top: var(--spacing-md);">View All Requests</a>
+        `;
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      }
+    }
+
+    // Handle attendance button
+    document.getElementById('attendanceBtn').addEventListener('click', async function() {
       Toast.info('Processing attendance...', 'Please wait');
-      setTimeout(() => {
-        Toast.success('Attendance marked successfully!', 'Success');
-      }, 1000);
+      
+      try {
+        // Get GPS location
+        if (!navigator.geolocation) {
+          Toast.error('Geolocation is not supported by your browser', 'Error');
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          try {
+            const response = await fetch('/cics-attendance-system/backend/api/attendance/mark', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              credentials: 'include',
+              body: JSON.stringify({
+                session_id: 1, // This should be dynamic based on current session
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+              })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+              Toast.success('Attendance marked successfully!', 'Success');
+              // Reload summary
+              loadDashboardData();
+            } else {
+              Toast.error(data.message || 'Failed to mark attendance', 'Error');
+            }
+          } catch (error) {
+            Toast.error('Failed to mark attendance. Please try again.', 'Error');
+          }
+        }, (error) => {
+          Toast.error('Unable to get your location. Please enable location services.', 'Error');
+        });
+      } catch (error) {
+        Toast.error('An error occurred. Please try again.', 'Error');
+      }
     });
+
+    // Load data on page load
+    loadDashboardData();
   </script>
 </body>
-</html>
 
+</html>
