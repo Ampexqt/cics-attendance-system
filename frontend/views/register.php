@@ -102,7 +102,7 @@
               <div class="form-group">
                 <label for="password" class="form-label required">Password</label>
                 <div class="input-group">
-                  <input type="password" name="password" id="password" class="form-input" placeholder="Enter password (min. 8 characters)" required>
+                  <input type="password" name="password" id="password" class="form-input" placeholder="Enter password (min. 8 characters)" style="text-align: left !important;" required>
                   <button type="button" class="password-toggle">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
@@ -114,7 +114,7 @@
               <div class="form-group">
                 <label for="confirmPassword" class="form-label required">Confirm Password</label>
                 <div class="input-group">
-                  <input type="password" name="confirmPassword" id="confirmPassword" class="form-input" placeholder="Confirm your password" data-confirm="password" required>
+                  <input type="password" name="confirmPassword" id="confirmPassword" class="form-input" placeholder="Confirm your password" data-confirm="password" style="text-align: left !important;" required>
                   <button type="button" class="password-toggle">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />

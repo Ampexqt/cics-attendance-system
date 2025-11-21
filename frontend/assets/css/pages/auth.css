@@ -120,6 +120,7 @@
 
 .input-group .form-input {
   padding-right: 2.5rem;
+  text-align: left !important;
 }
 
 /* Ensure password input placeholders are left-aligned */

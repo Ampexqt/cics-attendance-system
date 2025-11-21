@@ -97,7 +97,7 @@
 }
 
 .input-group .form-input {
-  padding-left: 2.5rem;
+  padding-left: var(--spacing-md);
 }
 
 .input-group-icon {
