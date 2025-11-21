@@ -15,43 +15,50 @@ $activePage = 'campus';
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
+    /* ========================================
+       LAYOUT BUILDER - RESPONSIVE GRID SYSTEM
+       ======================================== */
+    
+    /* Base Layout - Mobile First (320px+) */
     .two-column-layout {
       display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
       align-items: stretch;
-    }
-    
-    @media (max-width: 1200px) {
-      .two-column-layout {
-        grid-template-columns: 1fr;
-      }
     }
     
     .right-column {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1rem;
     }
+    
+    /* ========================================
+       MAP CONTAINER - RESPONSIVE
+       ======================================== */
     
     .map-card {
       display: flex;
       flex-direction: column;
       height: 100%;
+      min-height: 400px;
     }
     
     .map-card .card-body {
       display: flex;
       flex-direction: column;
       flex: 1;
+      padding: 1rem;
     }
     
     #campusMap {
       flex: 1;
-      min-height: 500px;
+      min-height: 350px;
       width: 100%;
       border-radius: var(--border-radius);
+      z-index: 1;
+      position: relative;
     }
     
     .map-container {
@@ -59,6 +66,17 @@ $activePage = 'campus';
       flex: 1;
       display: flex;
       flex-direction: column;
+      z-index: 1;
+    }
+    
+    /* Ensure Leaflet controls don't overlap header */
+    .leaflet-top,
+    .leaflet-bottom {
+      z-index: 1 !important;
+    }
+    
+    .leaflet-pane {
+      z-index: 1 !important;
     }
     
     .map-loading {
@@ -69,35 +87,40 @@ $activePage = 'campus';
       text-align: center;
       z-index: 1000;
       background: rgba(255, 255, 255, 0.95);
-      padding: 2rem;
+      padding: 1.5rem;
       border-radius: var(--border-radius);
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
+    
+    /* ========================================
+       CURRENT SETTINGS CARD - RESPONSIVE
+       ======================================== */
     
     .current-settings-card {
       height: auto;
     }
     
     .current-settings-card .card-body {
-      padding: 1.5rem;
+      padding: 1rem;
     }
     
     .settings-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
       margin-top: 1rem;
     }
     
     .setting-item {
       background: var(--color-bg-secondary);
-      padding: 1rem;
+      padding: 0.875rem;
       border-radius: 8px;
       border: 1px solid var(--color-border);
+      text-align: center;
     }
     
     .setting-label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--color-text-muted);
       margin-bottom: 0.5rem;
       text-transform: uppercase;
@@ -106,11 +129,16 @@ $activePage = 'campus';
     }
     
     .setting-value {
-      font-size: 1.125rem;
+      font-size: 1rem;
       font-weight: 700;
       font-family: 'Courier New', monospace;
       color: var(--color-primary);
+      word-break: break-all;
     }
+    
+    /* ========================================
+       GPS FORM CARD - RESPONSIVE
+       ======================================== */
     
     .gps-form-card {
       height: auto;
@@ -118,7 +146,7 @@ $activePage = 'campus';
     }
     
     .gps-form-card .card-body {
-      padding: 1.5rem;
+      padding: 1rem;
     }
     
     .form-field {
@@ -131,34 +159,204 @@ $activePage = 'campus';
     
     .radius-slider-container {
       display: flex;
-      align-items: center;
-      gap: 1rem;
+      flex-direction: column;
+      gap: 0.75rem;
       margin-top: 0.5rem;
     }
     
     .radius-slider {
-      flex: 1;
+      width: 100%;
     }
     
     .radius-value {
-      min-width: 70px;
+      width: 100%;
       text-align: center;
       font-weight: 700;
       color: var(--color-primary);
-      font-size: 1.125rem;
+      font-size: 1.25rem;
+      padding: 0.5rem;
+      background: var(--color-bg-secondary);
+      border-radius: var(--border-radius);
     }
     
     .form-actions {
       display: flex;
+      flex-direction: column;
       gap: 0.75rem;
       margin-top: 1.5rem;
       padding-top: 1.5rem;
       border-top: 1px solid var(--color-border);
     }
     
-    .btn-get-location {
-      flex: 1;
+    .btn-get-location,
+    .btn-save-settings {
+      width: 100%;
     }
+    
+    /* ========================================
+       MEDIA QUERIES - RESPONSIVE BREAKPOINTS
+       ======================================== */
+    
+    /* Small Tablets (480px+) */
+    @media (min-width: 480px) {
+      .settings-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      .setting-item {
+        text-align: left;
+      }
+      
+      .radius-slider-container {
+        flex-direction: row;
+        align-items: center;
+      }
+      
+      .radius-value {
+        min-width: 80px;
+        width: auto;
+        text-align: center;
+      }
+      
+      .form-actions {
+        flex-direction: row;
+      }
+      
+      .btn-get-location,
+      .btn-save-settings {
+        flex: 1;
+        width: auto;
+      }
+    }
+    
+    /* Tablets (768px+) */
+    @media (min-width: 768px) {
+      .two-column-layout {
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+      }
+      
+      .right-column {
+        gap: 1.25rem;
+      }
+      
+      .map-card {
+        min-height: 450px;
+      }
+      
+      #campusMap {
+        min-height: 400px;
+      }
+      
+      .map-card .card-body,
+      .current-settings-card .card-body,
+      .gps-form-card .card-body {
+        padding: 1.25rem;
+      }
+      
+      .map-loading {
+        padding: 2rem;
+      }
+      
+      .setting-value {
+        font-size: 1.125rem;
+      }
+    }
+    
+    /* Large Tablets / Small Desktops (992px+) */
+    @media (min-width: 992px) {
+      .two-column-layout {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+      }
+      
+      .map-card {
+        min-height: 500px;
+      }
+      
+      #campusMap {
+        min-height: 450px;
+      }
+    }
+    
+    /* Desktops (1200px+) */
+    @media (min-width: 1200px) {
+      .two-column-layout {
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 1.5rem;
+      }
+      
+      .map-card {
+        min-height: 550px;
+      }
+      
+      #campusMap {
+        min-height: 500px;
+      }
+      
+      .map-card .card-body,
+      .current-settings-card .card-body,
+      .gps-form-card .card-body {
+        padding: 1.5rem;
+      }
+      
+      .settings-grid {
+        gap: 1rem;
+      }
+      
+      .setting-item {
+        padding: 1rem;
+      }
+      
+      .setting-label {
+        font-size: 0.75rem;
+      }
+    }
+    
+    /* Large Desktops (1400px+) */
+    @media (min-width: 1400px) {
+      .two-column-layout {
+        grid-template-columns: 1.3fr 0.7fr;
+      }
+      
+      .map-card {
+        min-height: 600px;
+      }
+      
+      #campusMap {
+        min-height: 550px;
+      }
+    }
+    
+    /* Extra Large Desktops (1600px+) */
+    @media (min-width: 1600px) {
+      .two-column-layout {
+        grid-template-columns: 1.4fr 0.6fr;
+        max-width: 1800px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+    
+    /* ========================================
+       PRINT STYLES
+       ======================================== */
+    
+    @media print {
+      .two-column-layout {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-actions {
+        display: none;
+      }
+      
+      #campusMap {
+        min-height: 400px;
+        page-break-inside: avoid;
+      }
+    }
+    
     
     .btn-save {
       flex: 1;

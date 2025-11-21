@@ -55,6 +55,6 @@
     </a>
   </nav>
   <div class="sidebar-footer">
-    <p>© 2023 ZPPSU CICS<br>Campus Attendance System</p>
+    <p>© 2025 ZPPSU CICS<br>Campus Attendance System</p>
   </div>
 </aside>

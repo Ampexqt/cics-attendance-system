@@ -1,6 +1,6 @@
 <div class="main-header">
   <div class="main-header-title-group">
-    <h1 class="main-header-title">Admin Dashboard — Campus Attendance System</h1>
+    <h1 class="main-header-title">Admin Portal — CICS Attendance System</h1>
   </div>
   <div class="main-header-actions">
     <div class="main-header-user">
