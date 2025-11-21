@@ -1,11 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Dashboard - CICS Attendance System</title>
+  <!-- Base Styles -->
+  <link rel="stylesheet" href="../../assets/css/base/variables.css">
+  <link rel="stylesheet" href="../../assets/css/base/reset.css">
+  <link rel="stylesheet" href="../../assets/css/base/typography.css">
+  <!-- Layout Styles -->
+  <link rel="stylesheet" href="../../assets/css/layout/sidebar.css">
+  <link rel="stylesheet" href="../../assets/css/layout/grid.css">
+  <!-- Component Styles -->
+  <link rel="stylesheet" href="../../assets/css/components/buttons.css">
+  <link rel="stylesheet" href="../../assets/css/components/cards.css">
+  <link rel="stylesheet" href="../../assets/css/components/forms.css">
+  <!-- Page Styles -->
+  <link rel="stylesheet" href="../../assets/css/pages/dashboard.css">
+  <!-- Main Styles -->
   <link rel="stylesheet" href="../../assets/css/main.css">
 </head>
+
 <body>
   <div class="main-layout">
     <!-- Sidebar -->
@@ -193,5 +209,5 @@
     });
   </script>
 </body>
-</html>
 
+</html>
