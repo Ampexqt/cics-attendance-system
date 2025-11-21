@@ -50,6 +50,7 @@
 .form-input::placeholder,
 .form-textarea::placeholder {
   color: var(--text-muted);
+  text-align: left;
 }
 
 /* Input States */

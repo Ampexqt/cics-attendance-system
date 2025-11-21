@@ -5,6 +5,7 @@ $activePage = 'dashboard';
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +14,7 @@ $activePage = 'dashboard';
   <link rel="stylesheet" href="../../assets/css/pages/admin.css">
   <link rel="stylesheet" href="../../assets/css/main.css">
 </head>
+
 <body>
   <div class="main-layout">
     <!-- Sidebar -->
@@ -24,6 +26,7 @@ $activePage = 'dashboard';
 
       <div class="main-body">
         <!-- Dashboard Overview -->
+        <h2 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--spacing-lg);">Dashboard Overview</h2>
         <div class="dashboard-grid">
           <div class="stat-card">
             <div class="stat-card-header">
@@ -155,4 +158,5 @@ $activePage = 'dashboard';
 
   <?php include 'includes/scripts.php'; ?>
 </body>
+
 </html>

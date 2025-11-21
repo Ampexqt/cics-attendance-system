@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +15,10 @@
   <!-- Page Styles -->
   <link rel="stylesheet" href="../assets/css/pages/auth.css">
   <link rel="stylesheet" href="../assets/css/main.css">
+  <!-- Device Fingerprinting -->
+  <script src="../assets/js/fingerprint.js"></script>
 </head>
+
 <body>
   <div class="auth-container">
     <div class="auth-card" style="max-width: 48rem;">
@@ -47,19 +51,31 @@
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label for="section" class="form-label required">Section / Year Level</label>
-                <select name="section" id="section" class="form-select" required>
-                  <option value="">Select your section/year</option>
-                  <option value="1A">1st Year - Section A</option>
-                  <option value="1B">1st Year - Section B</option>
-                  <option value="2A">2nd Year - Section A</option>
-                  <option value="2B">2nd Year - Section B</option>
-                  <option value="3A">3rd Year - Section A</option>
-                  <option value="3B">3rd Year - Section B</option>
-                  <option value="4A">4th Year - Section A</option>
-                  <option value="4B">4th Year - Section B</option>
+                <label for="yearLevel" class="form-label required">Year Level</label>
+                <select name="yearLevel" id="yearLevel" class="form-select" required>
+                  <option value="">Select your year level</option>
+                  <option value="1">1st Year</option>
+                  <option value="2">2nd Year</option>
+                  <option value="3">3rd Year</option>
+                  <option value="4">4th Year</option>
                 </select>
               </div>
+              <div class="form-group">
+                <label for="section" class="form-label required">Section</label>
+                <select name="section" id="section" class="form-select" required>
+                  <option value="">Select your section</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                  <option value="E">E</option>
+                  <option value="F">F</option>
+                  <option value="G">G</option>
+                  <option value="H">H</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
               <div class="form-group">
                 <label for="program" class="form-label required">Program / Course</label>
                 <select name="program" id="program" class="form-select" required>
@@ -68,6 +84,9 @@
                   <option value="BSIT">Bachelor of Science in Information Technology</option>
                   <option value="BSIS">Bachelor of Science in Information Systems</option>
                 </select>
+              </div>
+              <div class="form-group">
+                <!-- Empty for layout balance -->
               </div>
             </div>
             <div class="form-group">
@@ -142,8 +161,14 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+          <!-- Hidden field for device fingerprint -->
+          <input type="hidden" name="deviceFingerprint" id="deviceFingerprint" value="">
+
+          <button type="submit" class="btn btn-primary btn-block" id="submitBtn">Sign Up</button>
           <p class="text-center text-sm mt-3" style="color: var(--text-secondary); font-size: var(--font-size-sm);">
+            <strong>Important:</strong> Your device will be registered during signup. Only this device will be allowed to login to your account for security purposes.
+          </p>
+          <p class="text-center text-sm mt-2" style="color: var(--text-secondary); font-size: var(--font-size-sm);">
             After submitting your registration, please wait for admin approval before you can access the system.
           </p>
         </form>
@@ -181,17 +206,93 @@
 
   <script src="../assets/js/global.js"></script>
   <script>
-    document.getElementById('registerForm').addEventListener('submit', function(e) {
+    let deviceFingerprintValue = '';
+
+    // Generate device fingerprint on page load
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        // Show loading state
+        const submitBtn = document.getElementById('submitBtn');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Initializing...';
+
+        // Generate fingerprint
+        deviceFingerprintValue = await DeviceFingerprint.generate();
+        document.getElementById('deviceFingerprint').value = deviceFingerprintValue;
+
+        console.log('Device fingerprint generated:', deviceFingerprintValue);
+
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      } catch (error) {
+        console.error('Failed to generate device fingerprint:', error);
+        Toast.error('Failed to initialize device fingerprint. Please refresh the page.', 'Error');
+      }
+    });
+
+    // Handle form submission
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      if (FormValidator.validate(this)) {
-        // Simulate registration - replace with actual API call
-        Toast.success('Registration submitted successfully!', 'Success');
-        setTimeout(() => {
-          Modal.open('successModal');
-        }, 500);
+
+      if (!FormValidator.validate(this)) {
+        return;
+      }
+
+      // Ensure device fingerprint is set
+      if (!deviceFingerprintValue) {
+        Toast.error('Device fingerprint not generated. Please refresh the page.', 'Error');
+        return;
+      }
+
+      // Prepare form data
+      const yearLevel = document.getElementById('yearLevel').value;
+      const section = document.getElementById('section').value;
+      const combinedSection = yearLevel + section; // Combine to format like "1A", "2B", etc.
+
+      const formData = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+        confirmPassword: document.getElementById('confirmPassword').value,
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        studentId: document.getElementById('studentId').value,
+        program: document.getElementById('program').value,
+        section: combinedSection,
+        parentFirstName: document.getElementById('parentFirstName').value,
+        parentLastName: document.getElementById('parentLastName').value,
+        parentEmail: document.getElementById('parentEmail').value,
+        parentContact: document.getElementById('parentContact').value,
+        relationship: document.getElementById('relationship').value,
+        deviceFingerprint: deviceFingerprintValue
+      };
+
+      try {
+        const response = await fetch('/cics-attendance-system/backend/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          Toast.success(data.message || 'Registration submitted successfully!', 'Success');
+          setTimeout(() => {
+            Modal.open('successModal');
+          }, 500);
+        } else {
+          Toast.error(data.message || 'Registration failed. Please try again.', 'Error');
+        }
+      } catch (error) {
+        console.error('Registration error:', error);
+        Toast.error('An error occurred. Please try again later.', 'Error');
       }
     });
   </script>
 </body>
-</html>
 
+</html>

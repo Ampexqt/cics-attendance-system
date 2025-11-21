@@ -9,16 +9,22 @@
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   z-index: var(--z-modal-backdrop);
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: var(--spacing-lg);
   opacity: 0;
-  transition: opacity var(--transition-base);
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--transition-base), visibility 0s linear 200ms;
 }
 
 .modal-backdrop.show {
+  display: flex;
   opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity var(--transition-base), visibility 0s linear 0s;
 }
 
 .modal {
@@ -147,13 +153,12 @@
     max-width: 100%;
     margin: var(--spacing-md);
   }
-  
+
   .modal-footer {
     flex-direction: column-reverse;
   }
-  
+
   .modal-footer .btn {
     width: 100%;
   }
 }
-

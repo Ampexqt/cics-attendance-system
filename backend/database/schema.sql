@@ -184,7 +184,7 @@ CREATE TABLE IF NOT EXISTS `settings` (
 
 -- Insert default admin user (password: admin123 - CHANGE IN PRODUCTION!)
 INSERT INTO `users` (`email`, `password`, `role`, `status`) VALUES
-('admin@zppsu.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'active');
+('admin@zppsu.edu', '$2a$10$AI0eMVzvxhKxi2SIyHCfmut46N9oH789cmhVfUHNXaf9j7sJ9ulvC', 'admin', 'active');
 
 -- Insert default settings
 INSERT INTO `settings` (`key`, `value`, `type`) VALUES

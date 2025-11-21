@@ -122,6 +122,11 @@
   padding-right: 2.5rem;
 }
 
+/* Ensure password input placeholders are left-aligned */
+.input-group .form-input::placeholder {
+  text-align: left !important;
+}
+
 .input-group .password-toggle {
   position: absolute;
   right: var(--spacing-md);

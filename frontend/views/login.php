@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +16,7 @@
   <link rel="stylesheet" href="../assets/css/pages/login-animations.css">
   <link rel="stylesheet" href="../assets/css/main.css">
 </head>
+
 <body class="login-page">
   <div class="auth-container">
     <div class="auth-card">
@@ -48,11 +50,11 @@
           </div>
           <button type="submit" class="btn btn-primary btn-block">Login</button>
         </form>
-        
+
         <div class="mt-4 text-center">
           <a href="#" class="forgot-password-link">Forgot Password?</a>
         </div>
-        
+
         <div class="mt-2 text-center">
           <p class="text-sm text-gray-600">
             Don't have an account? <a href="register.php" class="create-account-link">Create Account</a>
@@ -70,13 +72,14 @@
 
   <script src="../assets/js/global.js"></script>
   <script src="../assets/js/login-animations.js"></script>
+  <script src="../assets/js/fingerprint.js"></script>
   <script src="../assets/js/auth.js"></script>
   <script>
     // Custom password toggle for login page
     document.addEventListener('DOMContentLoaded', function() {
       const passwordToggle = document.querySelector('.password-toggle');
       const passwordInput = document.getElementById('password');
-      
+
       if (passwordToggle && passwordInput) {
         passwordToggle.addEventListener('click', function(e) {
           e.preventDefault();
@@ -161,7 +164,7 @@
 
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      
+
       // Validate form first
       if (!FormValidator.validate(this)) {
         return;
@@ -178,15 +181,31 @@
       submitBtn.textContent = 'Logging in...';
 
       try {
+        // Generate device fingerprint
+        let deviceFingerprint = null;
+        try {
+          submitBtn.textContent = 'Verifying device...';
+          deviceFingerprint = await DeviceFingerprint.generate();
+          console.log('Device fingerprint generated:', deviceFingerprint);
+        } catch (fingerprintError) {
+          console.error('Fingerprint generation error:', fingerprintError);
+          Toast.error('Unable to verify device. Please try again or use a different browser.', 'Device Verification Failed');
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+          return;
+        }
+
+        submitBtn.textContent = 'Authenticating...';
+
         // Call backend API to authenticate against database
-        const result = await AuthAPI.login(email, password);
+        const result = await AuthAPI.login(email, password, deviceFingerprint);
 
         if (result.success && result.data) {
           const userData = result.data;
-          
+
           // Show success message
           Toast.success('Login successful! Redirecting...', 'Success');
-          
+
           // Wait a moment for the toast to show, then redirect based on role
           setTimeout(() => {
             AuthAPI.redirectToDashboard(userData.role);
@@ -199,20 +218,14 @@
       } catch (error) {
         // Handle authentication errors
         let errorMessage = error.message || 'An error occurred during login';
-        
-        // Display user-friendly error messages
-        if (errorMessage.includes('Invalid email') || errorMessage.includes('Invalid credentials')) {
-          errorMessage = 'Invalid email/student ID or password. Please check your credentials.';
-        } else if (errorMessage.includes('not active') || errorMessage.includes('pending')) {
-          errorMessage = 'Your account is pending approval. Please wait for admin approval.';
-        } else if (errorMessage.includes('Device not registered')) {
-          errorMessage = 'Please use your registered device to log in.';
-        } else if (errorMessage.includes('Failed to fetch') || errorMessage.includes('Network')) {
+
+        // Backend now returns specific error messages, only override for network errors
+        if (errorMessage.includes('Failed to fetch') || errorMessage.includes('Network')) {
           errorMessage = 'Unable to connect to server. Please check your connection.';
         }
-        
+
         Toast.error(errorMessage, 'Login Failed');
-        
+
         // Re-enable submit button
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
@@ -220,5 +233,5 @@
     });
   </script>
 </body>
-</html>
 
+</html>

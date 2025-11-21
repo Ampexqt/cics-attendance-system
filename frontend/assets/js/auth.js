@@ -9,19 +9,26 @@ const AuthAPI = {
     /**
      * Login user with email/student ID and password
      */
-    async login(emailOrStudentId, password) {
+    async login(emailOrStudentId, password, deviceFingerprint = null) {
         try {
+            const requestBody = {
+                email: emailOrStudentId,
+                password: password,
+                // Note: Backend will determine role from database
+            };
+
+            // Include device fingerprint if provided (required for students)
+            if (deviceFingerprint) {
+                requestBody.deviceFingerprint = deviceFingerprint;
+            }
+
             const response = await fetch(`${this.baseURL}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include', // Include cookies for session
-                body: JSON.stringify({
-                    email: emailOrStudentId,
-                    password: password,
-                    // Note: Backend will determine role from database
-                })
+                body: JSON.stringify(requestBody)
             });
 
             const data = await response.json();
