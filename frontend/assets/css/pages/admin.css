@@ -103,7 +103,8 @@
     justify-content: space-between;
     align-items: center;
     padding: var(--spacing-lg) var(--spacing-xl);
-    background-color: var(--bg-dark) !important; /* Same as sidebar dark blue */
+    background-color: var(--bg-dark) !important;
+    /* Same as sidebar dark blue */
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: 0;
     position: sticky;
@@ -114,7 +115,8 @@
 .main-layout .main-header-title {
     font-size: var(--font-size-xl);
     font-weight: var(--font-weight-semibold);
-    color: var(--text-inverse) !important; /* White text */
+    color: var(--text-inverse) !important;
+    /* White text */
 }
 
 .main-header-actions {
@@ -217,7 +219,7 @@
     flex-wrap: wrap;
 }
 
-.dashboard-section-header > div:first-child {
+.dashboard-section-header>div:first-child {
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
@@ -343,13 +345,16 @@
 }
 
 .main-layout .btn-icon--light {
-    background-color: rgba(255, 255, 255, 0.1) !important; /* Light transparent on dark */
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    /* Light transparent on dark */
     border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--text-inverse) !important; /* White icon */
+    color: var(--text-inverse) !important;
+    /* White icon */
 }
 
 .main-layout .btn-icon--light:hover {
-    background-color: rgba(255, 255, 255, 0.2) !important; /* Slightly more visible on hover */
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    /* Slightly more visible on hover */
     border-color: rgba(255, 255, 255, 0.3);
     color: var(--text-inverse) !important;
 }
@@ -426,9 +431,12 @@
     transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast), color var(--transition-fast) !important;
     box-sizing: border-box !important;
     white-space: nowrap !important;
-    width: auto !important; /* Auto width - shrink to content */
-    min-width: auto !important; /* No minimum width */
-    max-width: none !important; /* No max width restriction */
+    width: auto !important;
+    /* Auto width - shrink to content */
+    min-width: auto !important;
+    /* No minimum width */
+    max-width: none !important;
+    /* No max width restriction */
 }
 
 .btn svg {
@@ -450,16 +458,19 @@
 .main-layout .btn-primary,
 .main-body .btn-primary,
 .main-content .btn-primary {
-    background-color: var(--bg-dark) !important; /* Same as sidebar dark blue */
+    background-color: var(--bg-dark) !important;
+    /* Same as sidebar dark blue */
     color: white !important;
-    box-shadow: none !important; /* Remove shadow */
+    box-shadow: none !important;
+    /* Remove shadow */
     border: 1px solid transparent !important;
 }
 
 .main-layout .btn-primary:hover,
 .main-body .btn-primary:hover,
 .main-content .btn-primary:hover {
-    background-color: var(--bg-dark-secondary) !important; /* Slightly lighter dark blue on hover */
+    background-color: var(--bg-dark-secondary) !important;
+    /* Slightly lighter dark blue on hover */
 }
 
 .btn-secondary {
@@ -777,10 +788,11 @@
 
 .main-layout .user-name {
     font-weight: var(--font-weight-medium);
-    color: var(--text-inverse) !important; /* White text */
+    color: var(--text-inverse) !important;
+    /* White text */
 }
 
-.card + .card {
+.card+.card {
     margin-top: var(--spacing-lg);
 }
 
@@ -820,7 +832,7 @@
     align-items: end;
 }
 
-.filters-grid > div {
+.filters-grid>div {
     display: flex;
     flex-direction: column;
 }
@@ -832,8 +844,9 @@
 }
 
 .filters-grid .form-field:last-child button,
-.filters-grid > div:last-child button {
-    width: auto; /* Auto width - shrink to content */
+.filters-grid>div:last-child button {
+    width: auto;
+    /* Auto width - shrink to content */
     margin-top: 1.625rem;
 }
 
@@ -856,7 +869,8 @@
 }
 
 .btn-block {
-    width: auto; /* Changed from 100% - buttons should shrink to content */
+    width: auto;
+    /* Changed from 100% - buttons should shrink to content */
     min-width: auto;
 }
 
@@ -1117,7 +1131,8 @@
     }
 
     .btn-block {
-        width: auto; /* Auto width even on mobile */
+        width: auto;
+        /* Auto width even on mobile */
     }
 
     .main-header {
@@ -1135,7 +1150,7 @@
         align-items: stretch;
     }
 
-    .dashboard-section-header > div:first-child {
+    .dashboard-section-header>div:first-child {
         width: 100%;
     }
 
@@ -1148,9 +1163,10 @@
         width: 100%;
         max-width: 100%;
     }
-    
+
     .table-actions button {
-        width: auto; /* Buttons should shrink to content */
+        width: auto;
+        /* Buttons should shrink to content */
         max-width: 100%;
     }
 }
