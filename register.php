@@ -221,13 +221,10 @@
         deviceFingerprintValue = await DeviceFingerprint.generate();
         document.getElementById('deviceFingerprint').value = deviceFingerprintValue;
 
-        console.log('Device fingerprint generated:', deviceFingerprintValue);
-
         // Re-enable submit button
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
       } catch (error) {
-        console.error('Failed to generate device fingerprint:', error);
         Toast.error('Failed to initialize device fingerprint. Please refresh the page.', 'Error');
       }
     });
@@ -288,7 +285,6 @@
           Toast.error(data.message || 'Registration failed. Please try again.', 'Error');
         }
       } catch (error) {
-        console.error('Registration error:', error);
         Toast.error('An error occurred. Please try again later.', 'Error');
       }
     });

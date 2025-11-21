@@ -25,6 +25,22 @@ Update `backend/config/app.php` with your settings:
 - Campus GPS coordinates
 - Attendance thresholds
 
+### 2.1. EmailJS Setup (Optional - for Instructor Credentials)
+
+To enable automatic email sending when adding instructors:
+
+1. Follow the detailed guide in `EMAILJS_SETUP_GUIDE.md`
+2. Configure EmailJS credentials in `frontend/assets/js/emailjs-config.js`
+
+**Quick Setup:**
+- Create account at [https://www.emailjs.com/](https://www.emailjs.com/)
+- Create an Email Service (Gmail, Outlook, etc.)
+- Create an Email Template with variables: `{{instructor_name}}`, `{{instructor_email}}`, `{{temp_password}}`
+- Get your Public Key from Account settings
+- Update `frontend/assets/js/emailjs-config.js` with your credentials
+
+**Note:** If EmailJS is not configured, the system will still generate passwords but won't send emails automatically. You can manually share credentials with instructors.
+
 ### 3. API Endpoints
 
 #### Authentication

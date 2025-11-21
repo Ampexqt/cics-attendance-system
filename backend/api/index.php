@@ -154,6 +154,16 @@ try {
                         Response::error('Method not allowed', null, 405);
                     }
                     break;
+
+                case 'instructors':
+                    if ($method === 'GET') {
+                        $adminController->getAllInstructors();
+                    } elseif ($method === 'POST') {
+                        $adminController->createInstructor();
+                    } else {
+                        Response::error('Method not allowed', null, 405);
+                    }
+                    break;
                     
                 case 'update-student':
                     if ($method === 'PUT') {
@@ -176,6 +186,32 @@ try {
                         $adminController->getDashboardStats();
                     } else {
                         Response::error('Method not allowed', null, 405);
+                    }
+                    break;
+
+                case 'subjects':
+                    // Handle subjects routes: /admin/subjects or /admin/subjects/{id}
+                    if (isset($segments[2]) && is_numeric($segments[2])) {
+                        // Route with ID: /admin/subjects/{id}
+                        $_GET['id'] = $segments[2];
+                        if ($method === 'GET') {
+                            $adminController->getSubject();
+                        } elseif ($method === 'PUT') {
+                            $adminController->updateSubject();
+                        } elseif ($method === 'DELETE') {
+                            $adminController->deleteSubject();
+                        } else {
+                            Response::error('Method not allowed', null, 405);
+                        }
+                    } else {
+                        // Route without ID: /admin/subjects
+                        if ($method === 'GET') {
+                            $adminController->getAllSubjects();
+                        } elseif ($method === 'POST') {
+                            $adminController->createSubject();
+                        } else {
+                            Response::error('Method not allowed', null, 405);
+                        }
                     }
                     break;
                     

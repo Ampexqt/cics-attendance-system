@@ -52,7 +52,6 @@ const AuthAPI = {
 
             return data;
         } catch (error) {
-            console.error('Login error:', error);
             throw error;
         }
     },
@@ -67,7 +66,7 @@ const AuthAPI = {
                 credentials: 'include'
             });
         } catch (error) {
-            console.error('Logout error:', error);
+            // Logout error handled silently
         } finally {
             // Clear local session data
             sessionStorage.removeItem('user');

@@ -7,6 +7,8 @@
 
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/Student.php';
+require_once __DIR__ . '/../models/Instructor.php';
+require_once __DIR__ . '/../models/Subject.php';
 require_once __DIR__ . '/../models/Attendance.php';
 require_once __DIR__ . '/../database/Database.php';
 require_once __DIR__ . '/../middleware/Auth.php';
@@ -18,11 +20,15 @@ class AdminController
     private $userModel;
     private $studentModel;
     private $attendanceModel;
+    private $instructorModel;
+    private $subjectModel;
 
     public function __construct()
     {
         $this->userModel = new User();
         $this->studentModel = new Student();
+        $this->instructorModel = new Instructor();
+        $this->subjectModel = new Subject();
         $this->attendanceModel = new Attendance();
     }
 
@@ -105,6 +111,76 @@ class AdminController
         $students = $this->studentModel->getAll($filters);
 
         Response::success('Students retrieved', $students);
+    }
+
+    public function getAllInstructors()
+    {
+        Auth::requireAdmin();
+
+        $filters = $_GET;
+        $instructors = $this->instructorModel->getAll($filters);
+
+        Response::success('Instructors retrieved', $instructors);
+    }
+
+    public function createInstructor()
+    {
+        Auth::requireAdmin();
+
+        $data = json_decode(file_get_contents('php://input'), true) ?? [];
+
+        $errors = Validator::validate($data, [
+            'first_name' => 'required|min:2',
+            'last_name' => 'required|min:2',
+            'department' => 'required|min:2',
+            'email' => 'required|email'
+        ]);
+
+        if (!empty($errors)) {
+            Response::validationError($errors);
+        }
+
+        // Ensure email is unique
+        if ($this->userModel->findByEmail($data['email'])) {
+            Response::validationError(['email' => 'Email is already in use']);
+        }
+
+        $plainPassword = $this->generateTempPassword();
+
+        $db = Database::getInstance();
+
+        try {
+            $db->beginTransaction();
+
+            $userId = $this->userModel->create([
+                'email' => $data['email'],
+                'password' => password_hash($plainPassword, PASSWORD_DEFAULT),
+                'role' => 'instructor',
+                'status' => 'active'
+            ]);
+
+            $instructorId = $this->instructorModel->create([
+                'user_id' => $userId,
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'department' => $data['department'],
+                'employee_id' => $data['employee_id'] ?? null
+            ]);
+
+            $db->commit();
+
+            $instructor = $this->instructorModel->findById($instructorId);
+
+            Response::success('Instructor added successfully', [
+                'instructor' => $instructor,
+                'temp_password' => $plainPassword
+            ]);
+        } catch (Exception $e) {
+            if ($db) {
+                $db->rollBack();
+            }
+            Response::error('Failed to create instructor: ' . $e->getMessage(), null, 500);
+        }
     }
 
     public function updateStudent()
@@ -199,5 +275,155 @@ class AdminController
             'total_classes' => (int)$classesCount,
             'average_checkin_time' => $avgTime['avg_time'] ?? 'N/A'
         ]);
+    }
+
+    public function getAllSubjects()
+    {
+        Auth::requireAdmin();
+
+        $filters = $_GET;
+        $subjects = $this->subjectModel->getAll($filters);
+
+        Response::success('Subjects retrieved', $subjects);
+    }
+
+    public function getSubject()
+    {
+        Auth::requireAdmin();
+
+        $subjectId = $_GET['id'] ?? null;
+        if (!$subjectId) {
+            Response::error('Subject ID is required', null, 400);
+        }
+
+        $subject = $this->subjectModel->findById($subjectId);
+        if (!$subject) {
+            Response::error('Subject not found', null, 404);
+        }
+
+        Response::success('Subject retrieved', $subject);
+    }
+
+    public function createSubject()
+    {
+        Auth::requireAdmin();
+
+        $data = json_decode(file_get_contents('php://input'), true) ?? [];
+
+        $errors = Validator::validate($data, [
+            'code' => 'required|max:20',
+            'name' => 'required|max:255',
+            'instructor_id' => 'required|numeric',
+            'program' => 'required|max:50',
+            'year_level' => 'required|numeric|min:1|max:4',
+            'section' => 'required|max:10',
+            'room' => 'max:50'
+        ]);
+
+        if (!empty($errors)) {
+            Response::validationError($errors);
+        }
+
+        // Check if subject code already exists
+        if ($this->subjectModel->findByCode($data['code'])) {
+            Response::validationError(['code' => 'Subject code already exists']);
+        }
+
+        // Verify instructor exists
+        $instructor = $this->instructorModel->findById($data['instructor_id']);
+        if (!$instructor) {
+            Response::validationError(['instructor_id' => 'Instructor not found']);
+        }
+
+        try {
+            $subjectId = $this->subjectModel->create($data);
+            $subject = $this->subjectModel->findById($subjectId);
+
+            Response::success('Subject created successfully', $subject);
+        } catch (Exception $e) {
+            Response::error('Failed to create subject: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function updateSubject()
+    {
+        Auth::requireAdmin();
+
+        $subjectId = $_GET['id'] ?? null;
+        if (!$subjectId) {
+            Response::error('Subject ID is required', null, 400);
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true) ?? [];
+
+        $errors = Validator::validate($data, [
+            'code' => 'required|max:20',
+            'name' => 'required|max:255',
+            'instructor_id' => 'required|numeric',
+            'program' => 'required|max:50',
+            'year_level' => 'required|numeric|min:1|max:4',
+            'section' => 'required|max:10',
+            'room' => 'max:50'
+        ]);
+
+        if (!empty($errors)) {
+            Response::validationError($errors);
+        }
+
+        // Check if subject exists
+        $existingSubject = $this->subjectModel->findById($subjectId);
+        if (!$existingSubject) {
+            Response::error('Subject not found', null, 404);
+        }
+
+        // Check if subject code already exists (excluding current subject)
+        $codeExists = $this->subjectModel->findByCode($data['code']);
+        if ($codeExists && $codeExists['id'] != $subjectId) {
+            Response::validationError(['code' => 'Subject code already exists']);
+        }
+
+        // Verify instructor exists
+        $instructor = $this->instructorModel->findById($data['instructor_id']);
+        if (!$instructor) {
+            Response::validationError(['instructor_id' => 'Instructor not found']);
+        }
+
+        try {
+            $this->subjectModel->update($subjectId, $data);
+            $subject = $this->subjectModel->findById($subjectId);
+
+            Response::success('Subject updated successfully', $subject);
+        } catch (Exception $e) {
+            Response::error('Failed to update subject: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function deleteSubject()
+    {
+        Auth::requireAdmin();
+
+        $subjectId = $_GET['id'] ?? null;
+        if (!$subjectId) {
+            Response::error('Subject ID is required', null, 400);
+        }
+
+        // Check if subject exists
+        $subject = $this->subjectModel->findById($subjectId);
+        if (!$subject) {
+            Response::error('Subject not found', null, 404);
+        }
+
+        try {
+            $this->subjectModel->delete($subjectId);
+            Response::success('Subject deleted successfully');
+        } catch (Exception $e) {
+            Response::error('Failed to delete subject: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    private function generateTempPassword($length = 12)
+    {
+        $bytes = random_bytes($length);
+        return substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $length);
     }
 }

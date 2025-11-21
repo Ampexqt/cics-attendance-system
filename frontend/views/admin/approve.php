@@ -27,14 +27,17 @@ $activePage = 'approve';
       <?php include 'includes/header.php'; ?>
 
       <div class="main-body">
-        <div class="dashboard-section-header">
-          <h2 class="dashboard-section-title">Approve Student Registration</h2>
+        <div class="page-heading">
+          <div>
+            <h1 class="page-title">Approve Student Registration</h1>
+            <p class="page-subtitle">Review and process pending student requests</p>
+          </div>
         </div>
 
         <div class="card">
           <div class="card-body">
-            <div class="dashboard-section-header">
-              <h3 class="stat-card-title" style="font-size: var(--font-size-lg); color: var(--text-primary);">Pending Approvals</h3>
+            <div class="card-header">
+              <h3 class="card-title">Pending Approvals</h3>
               <div class="search-container">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="search-icon">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
@@ -43,16 +46,16 @@ $activePage = 'approve';
               </div>
             </div>
 
-            <div id="loadingState" class="text-center" style="padding: 3rem;">
+            <div id="loadingState" class="placeholder-panel placeholder-panel--compact">
               <p>Loading pending registrations...</p>
             </div>
 
-            <div id="emptyState" class="text-center" style="padding: 3rem; display: none;">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 64px; height: 64px; margin: 0 auto 1rem; color: var(--text-muted);">
+            <div id="emptyState" class="placeholder-panel placeholder-panel--compact" style="display: none;">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
               </svg>
-              <h4 style="margin-bottom: 0.5rem; color: var(--text-secondary);">No Pending Registrations</h4>
-              <p style="color: var(--text-muted);">All student registrations have been processed.</p>
+              <h4>No Pending Registrations</h4>
+              <p>All student registrations have been processed.</p>
             </div>
 
             <div class="table-container" id="tableContainer" style="display: none;">
@@ -91,13 +94,13 @@ $activePage = 'approve';
       </div>
       <div class="modal-body">
         <p>Are you sure you want to approve this student's registration?</p>
-        <p style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-top: var(--spacing-sm);">
+        <p class="helper-text">
           The student will be able to log in after approval.
         </p>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline btn-sm" onclick="closeApproveModal()">Cancel</button>
-        <button class="btn btn-primary btn-sm" onclick="confirmApprove()" style="background-color: #fcd34d; color: #92400e;">
+        <button class="btn btn-warning btn-sm" onclick="confirmApprove()">
           Approve
         </button>
       </div>
@@ -117,13 +120,13 @@ $activePage = 'approve';
       </div>
       <div class="modal-body">
         <p>Are you sure you want to reject this student's registration?</p>
-        <p style="color: var(--danger-red); font-size: var(--font-size-sm); margin-top: var(--spacing-sm);">
+        <p class="helper-text helper-text--danger">
           <strong>Warning:</strong> This action cannot be undone.
         </p>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline btn-sm" onclick="closeRejectModal()">Cancel</button>
-        <button class="btn btn-sm" onclick="confirmReject()" style="background-color: #fee2e2; color: #b91c1c;">
+        <button class="btn btn-danger btn-sm" onclick="confirmReject()">
           Reject
         </button>
       </div>
@@ -170,7 +173,6 @@ $activePage = 'approve';
           showEmptyState();
         }
       } catch (error) {
-        console.error('Error loading pending registrations:', error);
         Toast.error('Failed to connect to server', 'Error');
         showEmptyState();
       } finally {
@@ -202,7 +204,7 @@ $activePage = 'approve';
           <td>${student.student_id}</td>
           <td>${fullName}</td>
           <td>${student.program}</td>
-          <td style="font-family: monospace;" title="${deviceFingerprint}">${fingerprintDisplay}</td>
+          <td class="text-mono" title="${deviceFingerprint}">${fingerprintDisplay}</td>
           <td>${registrationDate}</td>
           <td>
             <div class="action-buttons">
@@ -300,7 +302,6 @@ $activePage = 'approve';
           Toast.error(data.message || 'Failed to approve registration', 'Error');
         }
       } catch (error) {
-        console.error('Error approving student:', error);
         Toast.error('Failed to connect to server', 'Error');
       }
     }
@@ -336,7 +337,6 @@ $activePage = 'approve';
           Toast.error(data.message || 'Failed to reject registration', 'Error');
         }
       } catch (error) {
-        console.error('Error rejecting student:', error);
         Toast.error('Failed to connect to server', 'Error');
       }
     }

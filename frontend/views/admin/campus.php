@@ -23,19 +23,22 @@ $activePage = 'campus';
       <?php include 'includes/header.php'; ?>
 
       <div class="main-body">
-        <div class="dashboard-section-header">
-          <h2 class="dashboard-section-title">Campus Map Visualization</h2>
+        <div class="page-heading">
+          <div>
+            <h1 class="page-title">Campus Restrictions</h1>
+            <p class="page-subtitle">Visualize the campus map and GPS constraints</p>
+          </div>
         </div>
 
-        <div class="card" style="margin-bottom: var(--spacing-2xl);">
+        <div class="card">
           <div class="card-body">
-            <div style="height: 400px; background-color: var(--bg-secondary); border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary);">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 4rem; height: 4rem; margin-bottom: var(--spacing-md); color: var(--primary-blue);">
+            <div class="placeholder-panel map-placeholder">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 6.627-5.373 12-12 12s-12-5.373-12-12 5.373-12 12-12 12 5.373 12 12z" />
               </svg>
-              <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); margin-bottom: var(--spacing-xs); color: var(--text-primary);">Campus Map</h3>
-              <p>Interactive map visualization will be displayed here</p>
+              <h3 class="card-title">Campus Map</h3>
+              <p class="text-muted">Interactive map visualization will be displayed here.</p>
             </div>
           </div>
         </div>
@@ -52,13 +55,13 @@ $activePage = 'campus';
 
         <div class="card">
           <div class="card-body">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg);">
-              <div>
-                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: var(--font-weight-medium); font-size: var(--font-size-sm);">Center Latitude</label>
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Center Latitude</label>
                 <input type="text" class="form-control" placeholder="e.g. 7.1117">
               </div>
-              <div>
-                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: var(--font-weight-medium); font-size: var(--font-size-sm);">Center Longitude</label>
+              <div class="form-field">
+                <label>Center Longitude</label>
                 <input type="text" class="form-control" placeholder="e.g. 122.0735">
               </div>
             </div>

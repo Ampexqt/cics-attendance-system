@@ -12,47 +12,6 @@ $activePage = 'summary';
   <link rel="stylesheet" href="../../assets/css/base/variables.css">
   <link rel="stylesheet" href="../../assets/css/pages/admin.css">
   <link rel="stylesheet" href="../../assets/css/main.css">
-  <style>
-    .filters-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--spacing-lg);
-      margin-bottom: var(--spacing-xl);
-      align-items: end;
-    }
-    .pagination {
-      display: flex;
-      justify-content: flex-end;
-      gap: var(--spacing-xs);
-      margin-top: var(--spacing-lg);
-    }
-    .page-item {
-      width: 2rem;
-      height: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      color: var(--text-secondary);
-      font-size: var(--font-size-sm);
-      transition: all var(--transition-fast);
-    }
-    .page-item:hover {
-      background-color: var(--bg-secondary);
-      color: var(--primary-blue);
-    }
-    .page-item.active {
-      background-color: var(--primary-blue);
-      color: white;
-      border-color: var(--primary-blue);
-    }
-    .page-item.disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  </style>
 </head>
 <body>
   <div class="main-layout">
@@ -64,37 +23,45 @@ $activePage = 'summary';
       <?php include 'includes/header.php'; ?>
 
       <div class="main-body">
+        <div class="page-heading">
+          <div>
+            <h1 class="page-title">Attendance Summary</h1>
+            <p class="page-subtitle">Filter and export attendance logs</p>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-body">
             <!-- Filters -->
-            <div class="filters-container">
-              <div>
-                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: var(--font-weight-medium); font-size: var(--font-size-sm);">Date Range</label>
+            <div class="filters-grid">
+              <div class="form-field">
+                <label>Date Range</label>
                 <select class="form-control">
                   <option>This Week</option>
                   <option>This Month</option>
                   <option>This Year</option>
                 </select>
               </div>
-              <div>
-                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: var(--font-weight-medium); font-size: var(--font-size-sm);">Subject</label>
+              <div class="form-field">
+                <label>Subject</label>
                 <select class="form-control">
                   <option>All Subjects</option>
                   <option>CS101</option>
                   <option>IT205</option>
                 </select>
               </div>
-              <div>
-                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: var(--font-weight-medium); font-size: var(--font-size-sm);">Section</label>
+              <div class="form-field">
+                <label>Section</label>
                 <select class="form-control">
                   <option>All Sections</option>
                   <option>BSCS 3A</option>
                   <option>BSIT 2B</option>
                 </select>
               </div>
-              <div>
-                <button class="btn btn-primary" style="width: 100%;">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.25rem; height: 1.25rem;">
+              <div class="form-field">
+                <label>&nbsp;</label>
+                <button type="button" class="btn btn-primary btn-block">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
                   </svg>
                   Apply Filters
@@ -102,19 +69,23 @@ $activePage = 'summary';
               </div>
             </div>
 
-            <div class="dashboard-section-header">
-              <h3 class="stat-card-title" style="font-size: var(--font-size-lg); color: var(--text-primary);">Attendance Records</h3>
-              <div style="display: flex; gap: var(--spacing-md);">
-                <div style="width: 300px;">
-                  <input type="text" class="form-control" placeholder="Search students...">
-                </div>
-                <button class="btn btn-warning" style="background-color: #fcd34d; color: #92400e;">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.25rem; height: 1.25rem;">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                  </svg>
-                  Export
-                </button>
+            <div class="card-header">
+              <h3 class="card-title">Attendance Records</h3>
+            </div>
+
+            <div class="table-actions table-actions-below">
+              <div class="search-container table-search">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="search-icon">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+                <input type="text" class="search-input" placeholder="Search students...">
               </div>
+              <button class="btn btn-warning">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                Export
+              </button>
             </div>
 
             <div class="table-container">
@@ -186,8 +157,8 @@ $activePage = 'summary';
               </table>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--spacing-lg);">
-              <span style="font-size: var(--font-size-sm); color: var(--text-secondary);">Showing 1-5 of 120 records</span>
+            <div class="table-footer">
+              <span class="text-muted">Showing 1-5 of 120 records</span>
               <div class="pagination">
                 <div class="page-item">Previous</div>
                 <div class="page-item active">1</div>
