@@ -37,6 +37,15 @@
     font-size: var(--font-size-sm);
     color: rgba(255, 255, 255, 0.7);
 }
+.sidebar-logo {
+    width: 100%;
+    max-width: 120px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: var(--radius-md);
+}
+
 
 .sidebar-nav {
     flex: 1;
