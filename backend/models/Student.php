@@ -100,30 +100,5 @@ class Student {
         $this->db->query($sql, $params);
         return true;
     }
-    
-    public function getAttendanceStats($studentId, $startDate = null, $endDate = null) {
-        $sql = "SELECT 
-                    COUNT(*) as total_sessions,
-                    SUM(CASE WHEN ar.status = 'present' THEN 1 ELSE 0 END) as present,
-                    SUM(CASE WHEN ar.status = 'late' THEN 1 ELSE 0 END) as late,
-                    SUM(CASE WHEN ar.status = 'absent' THEN 1 ELSE 0 END) as absent
-                FROM attendance_sessions as
-                LEFT JOIN attendance_records ar ON as.id = ar.session_id AND ar.student_id = :student_id
-                WHERE 1=1";
-        
-        $params = [':student_id' => $studentId];
-        
-        if ($startDate) {
-            $sql .= " AND as.session_date >= :start_date";
-            $params[':start_date'] = $startDate;
-        }
-        
-        if ($endDate) {
-            $sql .= " AND as.session_date <= :end_date";
-            $params[':end_date'] = $endDate;
-        }
-        
-        return $this->db->fetchOne($sql, $params);
-    }
 }
 

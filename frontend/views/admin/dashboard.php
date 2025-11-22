@@ -111,54 +111,36 @@ $activePage = 'dashboard';
             <div class="stat-card-value">--:--</div>
           </div>
         </div>
+      </div>
+  </div>
+  </div>
+  </div>
 
-        <!-- Recent Activity -->
-        <div class="dashboard-section">
-          <div class="dashboard-section-header">
-            <h2 class="dashboard-section-title">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Recent Attendance Activity
-            </h2>
-            <a href="summary.php" class="link-action">View All</a>
-          </div>
-          <div class="card">
-            <div class="card-body">
-              <div class="activity-log">
-                <div class="placeholder-panel placeholder-panel--compact">
-                  <p>No recent activity found.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Attendance by Department -->
-        <div class="dashboard-section">
-          <div class="dashboard-section-header">
-            <h2 class="dashboard-section-title">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-              </svg>
-              Attendance by Department
-            </h2>
-            <select class="form-control form-control-compact">
-              <option>This Week</option>
-              <option>This Month</option>
-              <option>This Year</option>
-            </select>
-          </div>
-          <div class="card">
-            <div class="card-body">
-              <div class="placeholder-panel placeholder-panel--compact">
-                <p>No data available for the selected period.</p>
-              </div>
-            </div>
-          </div>
+  <!-- Attendance by Department -->
+  <div class="dashboard-section">
+    <div class="dashboard-section-header">
+      <h2 class="dashboard-section-title">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+        </svg>
+        Attendance by Department
+      </h2>
+      <select class="form-control form-control-compact">
+        <option>This Week</option>
+        <option>This Month</option>
+        <option>This Year</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="placeholder-panel placeholder-panel--compact">
+          <p>No data available for the selected period.</p>
         </div>
       </div>
-    </main>
+    </div>
+  </div>
+  </div>
+  </main>
   </div>
 
   <?php include 'includes/scripts.php'; ?>

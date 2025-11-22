@@ -39,7 +39,7 @@ $activePage = 'dashboard';
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">3</div>
+            <div class="stat-card-value" data-stat="active-sessions">0</div>
           </div>
 
           <div class="stat-card">
@@ -51,7 +51,7 @@ $activePage = 'dashboard';
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">7</div>
+            <div class="stat-card-value" data-stat="pending-corrections">0</div>
           </div>
 
           <div class="stat-card">
@@ -63,7 +63,7 @@ $activePage = 'dashboard';
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">12</div>
+            <div class="stat-card-value" data-stat="subjects-assigned">0</div>
           </div>
 
           <div class="stat-card">
@@ -75,7 +75,7 @@ $activePage = 'dashboard';
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">8</div>
+            <div class="stat-card-value" data-stat="sections-handling">0</div>
           </div>
 
           <div class="stat-card">
@@ -87,7 +87,7 @@ $activePage = 'dashboard';
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">5</div>
+            <div class="stat-card-value" data-stat="today-classes">0</div>
           </div>
         </div>
 
@@ -114,30 +114,9 @@ $activePage = 'dashboard';
                     <th>ACTION</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="active-sessions-tbody">
                   <tr>
-                    <td>Data Structures</td>
-                    <td>CS-3A</td>
-                    <td>08:00 AM - 10:00 AM</td>
-                    <td>Room 301</td>
-                    <td><span class="status-badge active">Active</span></td>
-                    <td><button class="btn btn-primary btn-sm">End Session</button></td>
-                  </tr>
-                  <tr>
-                    <td>Web Development</td>
-                    <td>IT-2B</td>
-                    <td>10:00 AM - 12:00 PM</td>
-                    <td>Lab 204</td>
-                    <td><span class="status-badge active">Active</span></td>
-                    <td><button class="btn btn-primary btn-sm">End Session</button></td>
-                  </tr>
-                  <tr>
-                    <td>Database Systems</td>
-                    <td>CS-3B</td>
-                    <td>01:00 PM - 03:00 PM</td>
-                    <td>Room 305</td>
-                    <td><span class="status-badge active">Active</span></td>
-                    <td><button class="btn btn-primary btn-sm">End Session</button></td>
+                    <td colspan="6" style="text-align: center;">Loading...</td>
                   </tr>
                 </tbody>
               </table>
@@ -161,25 +140,19 @@ $activePage = 'dashboard';
               <div class="filter-controls">
                 <div class="filter-group">
                   <label class="filter-label">Subject</label>
-                  <select class="form-select" style="width: 200px;">
-                    <option>All Subjects</option>
-                    <option>Data Structures</option>
-                    <option>Web Development</option>
-                    <option>Database Systems</option>
+                  <select id="filter-subject" class="form-select" style="width: 200px;">
+                    <option value="">All Subjects</option>
                   </select>
                 </div>
                 <div class="filter-group">
                   <label class="filter-label">Section</label>
-                  <select class="form-select" style="width: 200px;">
-                    <option>All Sections</option>
-                    <option>CS-3A</option>
-                    <option>IT-2B</option>
-                    <option>CS-3B</option>
+                  <select id="filter-section" class="form-select" style="width: 200px;">
+                    <option value="">All Sections</option>
                   </select>
                 </div>
                 <div class="filter-group">
                   <label class="filter-label">Date</label>
-                  <input type="date" class="form-control" style="width: 200px;">
+                  <input id="filter-date" type="date" class="form-control" style="width: 200px;">
                 </div>
                 <div class="filter-group" style="flex: 1; min-width: 250px;">
                   <label class="filter-label">Search</label>
@@ -187,7 +160,7 @@ $activePage = 'dashboard';
                     <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                     </svg>
-                    <input type="text" class="search-input" placeholder="Search students...">
+                    <input id="filter-search" type="text" class="search-input" placeholder="Search students...">
                   </div>
                 </div>
               </div>
@@ -202,30 +175,9 @@ $activePage = 'dashboard';
                     <th>NOTES</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="attendance-logs-tbody">
                   <tr>
-                    <td>Alice Johnson</td>
-                    <td>08:05 AM</td>
-                    <td><span class="status-badge present">Present</span></td>
-                    <td>-</td>
-                  </tr>
-                  <tr>
-                    <td>Bob Smith</td>
-                    <td>08:15 AM</td>
-                    <td><span class="status-badge late">Late</span></td>
-                    <td>Traffic</td>
-                  </tr>
-                  <tr>
-                    <td>Charlie Brown</td>
-                    <td>08:02 AM</td>
-                    <td><span class="status-badge present">Present</span></td>
-                    <td>-</td>
-                  </tr>
-                  <tr>
-                    <td>Diana Prince</td>
-                    <td>-</td>
-                    <td><span class="status-badge absent">Absent</span></td>
-                    <td>-</td>
+                    <td colspan="4" style="text-align: center;">Loading...</td>
                   </tr>
                 </tbody>
               </table>
@@ -282,34 +234,9 @@ $activePage = 'dashboard';
                     <th>ACTION</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="correction-requests-tbody">
                   <tr>
-                    <td>Alice Johnson</td>
-                    <td>Data Structures</td>
-                    <td>2024-01-15</td>
-                    <td>Mark as Present</td>
-                    <td><span class="status-badge pending">Pending</span></td>
-                    <td>
-                      <div class="action-buttons">
-                        <button class="btn-action btn-approve">Approve</button>
-                        <button class="btn-action btn-reject">Reject</button>
-                        <button class="btn btn-outline btn-sm">Comment</button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Bob Smith</td>
-                    <td>Web Development</td>
-                    <td>2024-01-14</td>
-                    <td>Change to Late</td>
-                    <td><span class="status-badge pending">Pending</span></td>
-                    <td>
-                      <div class="action-buttons">
-                        <button class="btn-action btn-approve">Approve</button>
-                        <button class="btn-action btn-reject">Reject</button>
-                        <button class="btn btn-outline btn-sm">Comment</button>
-                      </div>
-                    </td>
+                    <td colspan="6" style="text-align: center;">Loading...</td>
                   </tr>
                 </tbody>
               </table>
@@ -390,7 +317,7 @@ $activePage = 'dashboard';
   </div>
 
   <?php include 'includes/scripts.php'; ?>
+  <script src="dashboard.js"></script>
 </body>
 
 </html>
-

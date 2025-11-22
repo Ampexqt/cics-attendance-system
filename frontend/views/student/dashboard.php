@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Student Dashboard
  * CICS Attendance System
@@ -16,10 +17,10 @@ $program = '';
 $section = '';
 
 if ($userData) {
-    $studentName = ($userData['first_name'] ?? '') . ' ' . ($userData['last_name'] ?? '');
-    $studentId = $userData['student_id'] ?? '';
-    $program = $userData['program'] ?? '';
-    $section = $userData['section'] ?? '';
+  $studentName = ($userData['first_name'] ?? '') . ' ' . ($userData['last_name'] ?? '');
+  $studentId = $userData['student_id'] ?? '';
+  $program = $userData['program'] ?? '';
+  $section = $userData['section'] ?? '';
 }
 ?>
 <!DOCTYPE html>
@@ -151,42 +152,6 @@ if ($userData) {
             </div>
           </div>
 
-          <!-- Attendance Summary Card -->
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.25rem; height: 1.25rem; display: inline-block; margin-right: var(--spacing-sm);">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Attendance Summary
-              </h3>
-            </div>
-            <div class="card-body">
-              <div class="attendance-summary">
-                <div class="summary-chart">
-                  <svg viewBox="0 0 100 100">
-                    <circle class="summary-chart-circle summary-chart-bg" cx="50" cy="50" r="36"></circle>
-                    <circle class="summary-chart-circle summary-chart-progress" cx="50" cy="50" r="36" id="summaryProgress" style="--progress: 0;"></circle>
-                  </svg>
-                  <div class="summary-chart-text" id="summaryPercentage">0%</div>
-                </div>
-                <div class="summary-stats">
-                  <div class="summary-stat">
-                    <span class="summary-stat-label">Absences:</span>
-                    <strong id="summaryAbsences">0</strong>
-                  </div>
-                  <div class="summary-stat">
-                    <span class="summary-stat-label">Late:</span>
-                    <strong id="summaryLate">0</strong>
-                  </div>
-                  <a href="logs.php" style="color: var(--primary-blue); font-size: var(--font-size-sm); margin-top: var(--spacing-sm); display: inline-block;">
-                    View Full Logs →
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- Correction Requests Card -->
           <div class="card">
             <div class="card-header">
@@ -247,28 +212,6 @@ if ($userData) {
     // Load dashboard data
     async function loadDashboardData() {
       try {
-        // Load attendance summary
-        const summaryResponse = await fetch('/cics-attendance-system/backend/api/attendance/summary', {
-          credentials: 'include'
-        });
-        
-        if (summaryResponse.ok) {
-          const summaryData = await summaryResponse.json();
-          if (summaryData.success && summaryData.data) {
-            const stats = summaryData.data;
-            const total = stats.total_sessions || 0;
-            const present = stats.present || 0;
-            const absent = stats.absent || 0;
-            const late = stats.late || 0;
-            
-            // Calculate percentage
-            const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
-            document.getElementById('summaryPercentage').textContent = percentage + '%';
-            document.getElementById('summaryProgress').style.setProperty('--progress', percentage);
-            document.getElementById('summaryAbsences').textContent = absent;
-            document.getElementById('summaryLate').textContent = late;
-          }
-        }
 
         // Load recent requests (if API exists)
         // For now, show empty state or link to requests page
@@ -287,7 +230,7 @@ if ($userData) {
     // Handle attendance button
     document.getElementById('attendanceBtn').addEventListener('click', async function() {
       Toast.info('Processing attendance...', 'Please wait');
-      
+
       try {
         // Get GPS location
         if (!navigator.geolocation) {
@@ -311,7 +254,7 @@ if ($userData) {
             });
 
             const data = await response.json();
-            
+
             if (data.success) {
               Toast.success('Attendance marked successfully!', 'Success');
               // Reload summary
