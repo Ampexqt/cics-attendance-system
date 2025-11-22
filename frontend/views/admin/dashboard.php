@@ -26,7 +26,12 @@ $activePage = 'dashboard';
 
       <div class="main-body">
         <!-- Dashboard Overview -->
-        <h2 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--spacing-lg);">Dashboard Overview</h2>
+        <div class="page-heading">
+          <div>
+            <h1 class="page-title">Dashboard Overview</h1>
+            <p class="page-subtitle">Real-time summary of attendance metrics</p>
+          </div>
+        </div>
         <div class="dashboard-grid">
           <div class="stat-card">
             <div class="stat-card-header">
@@ -116,13 +121,13 @@ $activePage = 'dashboard';
               </svg>
               Recent Attendance Activity
             </h2>
-            <a href="summary.php" style="color: var(--primary-blue); font-size: var(--font-size-sm);">View All</a>
+            <a href="summary.php" class="link-action">View All</a>
           </div>
           <div class="card">
             <div class="card-body">
               <div class="activity-log">
-                <div class="text-center" style="padding: var(--spacing-lg); color: var(--text-secondary);">
-                  No recent activity found.
+                <div class="placeholder-panel placeholder-panel--compact">
+                  <p>No recent activity found.</p>
                 </div>
               </div>
             </div>
@@ -138,7 +143,7 @@ $activePage = 'dashboard';
               </svg>
               Attendance by Department
             </h2>
-            <select class="form-select" style="width: auto;">
+            <select class="form-control form-control-compact">
               <option>This Week</option>
               <option>This Month</option>
               <option>This Year</option>
@@ -146,8 +151,8 @@ $activePage = 'dashboard';
           </div>
           <div class="card">
             <div class="card-body">
-              <div class="text-center" style="padding: var(--spacing-lg); color: var(--text-secondary);">
-                No data available for the selected period.
+              <div class="placeholder-panel placeholder-panel--compact">
+                <p>No data available for the selected period.</p>
               </div>
             </div>
           </div>

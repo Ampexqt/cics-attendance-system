@@ -186,9 +186,7 @@
         try {
           submitBtn.textContent = 'Verifying device...';
           deviceFingerprint = await DeviceFingerprint.generate();
-          console.log('Device fingerprint generated:', deviceFingerprint);
         } catch (fingerprintError) {
-          console.error('Fingerprint generation error:', fingerprintError);
           Toast.error('Unable to verify device. Please try again or use a different browser.', 'Device Verification Failed');
           submitBtn.disabled = false;
           submitBtn.textContent = originalText;

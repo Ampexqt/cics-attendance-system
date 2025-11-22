@@ -17,7 +17,6 @@ const DeviceFingerprint = {
             const fingerprint = await this.hashComponents(components);
             return fingerprint;
         } catch (error) {
-            console.error('Error generating device fingerprint:', error);
             // Fallback to basic fingerprint
             return this.generateFallbackFingerprint();
         }
@@ -257,7 +256,7 @@ const DeviceFingerprint = {
                 const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
                 return hashHex;
             } catch (e) {
-                console.error('SubtleCrypto error:', e);
+                // SubtleCrypto error handled silently
             }
         }
 

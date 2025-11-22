@@ -59,7 +59,7 @@ class Student {
         $sql = "SELECT s.*, u.email, u.status as user_status 
                 FROM students s 
                 JOIN users u ON s.user_id = u.id 
-                WHERE 1=1";
+                WHERE u.status != 'inactive'";
         $params = [];
         
         if (!empty($filters['program'])) {

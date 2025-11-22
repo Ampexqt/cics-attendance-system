@@ -188,3 +188,33 @@
   height: 1.5rem;
 }
 
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.status-badge.active {
+  background-color: var(--success-green-light);
+  color: var(--success-green);
+}
+
+.status-badge.pending {
+  background-color: var(--warning-orange-light);
+  color: var(--warning-orange);
+}
+
+.status-badge.rejected {
+  background-color: var(--error-red-light);
+  color: var(--error-red);
+}
+
+.status-badge.info {
+  background-color: var(--info-blue-light);
+  color: var(--info-blue);
+}
