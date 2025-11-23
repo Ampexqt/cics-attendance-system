@@ -134,6 +134,95 @@
     padding: var(--spacing-xl);
 }
 
+/* Subject Cards */
+.subject-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.subject-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 4px solid #0A7FDB;
+}
+
+.subject-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.subject-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.subject-code {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1A2B47;
+    margin: 0;
+}
+
+.subject-section {
+    background: #E6F2FF;
+    color: #0A7FDB;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.subject-name {
+    font-size: 1rem;
+    color: #1A2B47;
+    margin: 0 0 1rem 0;
+    font-weight: 500;
+}
+
+.subject-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #6B7280;
+}
+
+.subject-program {
+    font-weight: 500;
+    color: #4B5563;
+}
+
+.subject-schedule,
+.subject-room {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6B7280;
+}
+
+.subject-schedule svg,
+.subject-room svg {
+    width: 1rem;
+    height: 1rem;
+    color: #9CA3AF;
+}
+
+.no-subjects {
+    text-align: center;
+    padding: 2rem;
+    color: #9CA3AF;
+    background: #F9FAFB;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
 /* Dashboard Grid */
 .dashboard-grid {
     display: grid;

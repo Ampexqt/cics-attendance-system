@@ -8,6 +8,7 @@
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/Student.php';
 require_once __DIR__ . '/../models/Parent.php';
+require_once __DIR__ . '/../models/Instructor.php';
 require_once __DIR__ . '/../middleware/Auth.php';
 require_once __DIR__ . '/../utils/Response.php';
 require_once __DIR__ . '/../utils/Validator.php';
@@ -18,12 +19,14 @@ class AuthController
     private $userModel;
     private $studentModel;
     private $parentModel;
+    private $instructorModel;
 
     public function __construct()
     {
         $this->userModel = new User();
         $this->studentModel = new Student();
         $this->parentModel = new ParentModel();
+        $this->instructorModel = new Instructor();
     }
 
     public function login()
@@ -101,6 +104,11 @@ class AuthController
             $student = $this->studentModel->findByUserId($user['id']);
             if ($student) {
                 $userData = array_merge($userData, $student);
+            }
+        } elseif ($user['role'] === 'instructor') {
+            $instructor = $this->instructorModel->findByUserId($user['id']);
+            if ($instructor) {
+                $userData = array_merge($userData, $instructor);
             }
         }
 

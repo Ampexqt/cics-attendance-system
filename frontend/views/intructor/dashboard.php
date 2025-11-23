@@ -2,6 +2,25 @@
 require_once __DIR__ . '/../../../auth_check.php';
 // require_role('instructor');
 $activePage = 'dashboard';
+
+// Get the current user's ID from the session
+$userId = $_SESSION['user_id'] ?? null;
+
+// Initialize instructor model
+require_once __DIR__ . '/../../../backend/models/Instructor.php';
+$instructorModel = new Instructor();
+
+// Get instructor details
+$instructor = $instructorModel->findByUserId($userId);
+$assignedSubjects = [];
+
+if ($instructor) {
+    // Get assigned subjects for the instructor
+    $assignedSubjects = $instructorModel->getAssignedSubjects($instructor['id']);
+}
+
+// Count the number of assigned subjects
+$assignedSubjectsCount = count($assignedSubjects);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -63,7 +82,7 @@ $activePage = 'dashboard';
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">12</div>
+            <div class="stat-card-value"><?php echo $assignedSubjectsCount; ?></div>
           </div>
 
           <div class="stat-card">
@@ -89,6 +108,55 @@ $activePage = 'dashboard';
             </div>
             <div class="stat-card-value">5</div>
           </div>
+        </div>
+
+        <!-- Assigned Subjects Section -->
+        <div class="dashboard-section">
+          <div class="dashboard-section-header">
+            <h2 class="dashboard-section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+              My Assigned Subjects
+            </h2>
+          </div>
+          
+          <?php if (!empty($assignedSubjects)): ?>
+            <div class="subject-cards">
+              <?php foreach ($assignedSubjects as $subject): ?>
+                <div class="subject-card">
+                  <div class="subject-card-header">
+                    <h3 class="subject-code"><?php echo htmlspecialchars($subject['code']); ?></h3>
+                    <span class="subject-section"><?php echo htmlspecialchars($subject['section']); ?></span>
+                  </div>
+                  <h4 class="subject-name"><?php echo htmlspecialchars($subject['name']); ?></h4>
+                  <div class="subject-details">
+                    <span class="subject-program"><?php echo htmlspecialchars($subject['program']); ?> - Year <?php echo $subject['year_level']; ?></span>
+                    <?php if (!empty($subject['schedule'])): ?>
+                      <div class="subject-schedule">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span><?php echo htmlspecialchars($subject['schedule']); ?></span>
+                      </div>
+                    <?php endif; ?>
+                    <?php if (!empty($subject['room'])): ?>
+                      <div class="subject-room">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                        </svg>
+                        <span><?php echo htmlspecialchars($subject['room']); ?></span>
+                      </div>
+                    <?php endif; ?>
+                  </div>
+                </div>
+              <?php endforeach; ?>
+            </div>
+          <?php else: ?>
+            <div class="no-subjects">
+              <p>No subjects assigned yet.</p>
+            </div>
+          <?php endif; ?>
         </div>
 
         <!-- Active Attendance Sessions -->

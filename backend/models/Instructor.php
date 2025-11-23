@@ -29,6 +29,15 @@ class Instructor {
         return $this->db->lastInsertId();
     }
 
+    public function findByUserId($userId) {
+        $sql = "SELECT i.*, u.email, u.status as user_status
+                FROM instructors i
+                JOIN users u ON i.user_id = u.id
+                WHERE i.user_id = :user_id
+                LIMIT 1";
+        return $this->db->fetchOne($sql, [':user_id' => $userId]);
+    }
+
     public function findById($id) {
         $sql = "SELECT i.*, u.email, u.status as user_status
                 FROM instructors i
@@ -80,6 +89,21 @@ class Instructor {
         $sql = "UPDATE instructors SET " . implode(', ', $fields) . " WHERE id = :id";
         $this->db->query($sql, $params);
         return true;
+    }
+
+    /**
+     * Get all subjects assigned to an instructor
+     * 
+     * @param int $instructorId The ID of the instructor
+     * @return array Array of subjects assigned to the instructor
+     */
+    public function getAssignedSubjects($instructorId) {
+        $sql = "SELECT s.* 
+                FROM subjects s
+                WHERE s.instructor_id = :instructor_id
+                ORDER BY s.code, s.name";
+                
+        return $this->db->fetchAll($sql, [':instructor_id' => $instructorId]);
     }
 }
 

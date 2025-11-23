@@ -96,7 +96,7 @@ const AuthAPI = {
     redirectToDashboard(role) {
         const dashboards = {
             'student': '/cics-attendance-system/frontend/views/student/dashboard.php',
-            'instructor': '/cics-attendance-system/frontend/views/instructor/dashboard.php',
+            'instructor': '/cics-attendance-system/frontend/views/intructor/dashboard.php',
             'admin': '/cics-attendance-system/frontend/views/admin/dashboard.php'
         };
 
