@@ -156,7 +156,7 @@ $activePage = 'subjects';
 
   <!-- Delete Confirmation Modal -->
   <div class="modal-backdrop" id="deleteSubjectModalBackdrop">
-    <div class="modal modal-sm">
+    <div class="modal modal-sm" id="deleteSubjectModal">
       <div class="modal-header">
         <h3 class="modal-title">Delete Subject</h3>
         <button class="modal-close" type="button" aria-label="Close modal" onclick="Modal.close('deleteSubjectModal')">
