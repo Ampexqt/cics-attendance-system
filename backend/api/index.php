@@ -242,14 +242,26 @@ try {
                     break;
                     
                 case 'settings':
-                    // Handle settings routes: /admin/settings/campus
-                    if (isset($segments[2]) && $segments[2] === 'campus') {
-                        if ($method === 'GET') {
-                            $adminController->getCampusSettings();
-                        } elseif ($method === 'PUT') {
-                            $adminController->updateCampusSettings();
+                    // Handle settings routes: /admin/settings/campus or /admin/settings/system
+                    if (isset($segments[2])) {
+                        if ($segments[2] === 'campus') {
+                            if ($method === 'GET') {
+                                $adminController->getCampusSettings();
+                            } elseif ($method === 'PUT') {
+                                $adminController->updateCampusSettings();
+                            } else {
+                                Response::error('Method not allowed', null, 405);
+                            }
+                        } elseif ($segments[2] === 'system') {
+                            if ($method === 'GET') {
+                                $adminController->getSystemSettings();
+                            } elseif ($method === 'PUT') {
+                                $adminController->updateSystemSettings();
+                            } else {
+                                Response::error('Method not allowed', null, 405);
+                            }
                         } else {
-                            Response::error('Method not allowed', null, 405);
+                            Response::notFound('Settings endpoint not found');
                         }
                     } else {
                         Response::notFound('Settings endpoint not found');

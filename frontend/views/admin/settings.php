@@ -32,14 +32,67 @@ $activePage = 'settings';
 
         <div class="card">
           <div class="card-body">
-            <div class="placeholder-panel">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <h3 class="card-title">System Settings</h3>
-              <p class="text-muted">System configuration options will be available here.</p>
-            </div>
+            <form id="settingsForm">
+              <h2 class="section-title" style="margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem; justify-content: flex-start;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px; height: 20px;">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Attendance Settings
+              </h2>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="lateThreshold">Late Threshold (minutes)</label>
+                  <input type="number" id="lateThreshold" name="late_threshold" class="form-control" min="1" required>
+                  <small class="form-text text-muted">Students arriving after this time will be marked as late</small>
+                </div>
+
+                <div class="form-group">
+                  <label for="absentThreshold">Absence Threshold (minutes)</label>
+                  <input type="number" id="absentThreshold" name="absent_threshold" class="form-control" min="1" required>
+                  <small class="form-text text-muted">Students arriving after this time will be marked as absent</small>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-top: 1rem;">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="allowOverride" name="allow_override">
+                  Allow instructors to override attendance status
+                </label>
+              </div>
+
+              <hr style="margin: 2rem 0; border: 0; border-top: 1px solid var(--border-color);">
+
+              <h2 class="section-title" style="margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem; justify-content: flex-start;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px; height: 20px;">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+                Registration Settings
+              </h2>
+
+              <div class="form-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="requireApproval" name="require_approval">
+                  Require admin approval for new student registrations
+                </label>
+              </div>
+
+              <div class="form-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="sendEmailNotifications" name="send_email_notifications">
+                  Send email notifications for new registrations
+                </label>
+              </div>
+
+              <div class="form-actions" style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn btn-primary" id="saveSettingsBtn">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6A2.25 2.25 0 016 3.75h1.5m9 0h-9" />
+                  </svg>
+                  Save Settings
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -47,5 +100,99 @@ $activePage = 'settings';
   </div>
 
   <?php include 'includes/scripts.php'; ?>
+  <script>
+    (function() {
+      const API_BASE = '/cics-attendance-system/backend/api';
+      const elements = {
+        form: document.getElementById('settingsForm'),
+        saveBtn: document.getElementById('saveSettingsBtn'),
+        lateThreshold: document.getElementById('lateThreshold'),
+        absentThreshold: document.getElementById('absentThreshold'),
+        allowOverride: document.getElementById('allowOverride'),
+        requireApproval: document.getElementById('requireApproval'),
+        sendEmailNotifications: document.getElementById('sendEmailNotifications')
+      };
+
+      document.addEventListener('DOMContentLoaded', init);
+
+      function init() {
+        fetchSettings();
+        elements.form.addEventListener('submit', handleSaveSettings);
+      }
+
+      async function fetchSettings() {
+        try {
+          const response = await fetch(`${API_BASE}/admin/settings/system`, { credentials: 'include' });
+          const result = await response.json();
+
+          if (!response.ok || !result.success) {
+            throw new Error(result.message || 'Failed to load settings');
+          }
+
+          const settings = result.data;
+          
+          // Populate form
+          elements.lateThreshold.value = settings.late_threshold || 15;
+          elements.absentThreshold.value = settings.absent_threshold || 30;
+          elements.allowOverride.checked = !!settings.allow_override;
+          elements.requireApproval.checked = !!settings.require_approval;
+          elements.sendEmailNotifications.checked = !!settings.send_email_notifications;
+
+        } catch (error) {
+          Toast.error('Unable to load settings. Please refresh the page.');
+          console.error(error);
+        }
+      }
+
+      async function handleSaveSettings(event) {
+        event.preventDefault();
+        
+        if (!elements.form.checkValidity()) {
+          elements.form.reportValidity();
+          return;
+        }
+
+        setSavingState(true);
+
+        const payload = {
+          late_threshold: parseInt(elements.lateThreshold.value),
+          absent_threshold: parseInt(elements.absentThreshold.value),
+          allow_override: elements.allowOverride.checked,
+          require_approval: elements.requireApproval.checked,
+          send_email_notifications: elements.sendEmailNotifications.checked
+        };
+
+        try {
+          const response = await fetch(`${API_BASE}/admin/settings/system`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(payload)
+          });
+
+          const result = await response.json();
+
+          if (!response.ok || !result.success) {
+            throw new Error(result.message || 'Failed to save settings');
+          }
+
+          Toast.success('System settings saved successfully');
+        } catch (error) {
+          Toast.error(error.message || 'Unable to save settings.');
+        } finally {
+          setSavingState(false);
+        }
+      }
+
+      function setSavingState(isSaving) {
+        elements.saveBtn.disabled = isSaving;
+        elements.saveBtn.innerHTML = isSaving ? 'Saving...' : `
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6A2.25 2.25 0 016 3.75h1.5m9 0h-9" />
+          </svg>
+          Save Settings`;
+      }
+    })();
+  </script>
 </body>
 </html>

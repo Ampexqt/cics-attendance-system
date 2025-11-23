@@ -607,4 +607,77 @@ class AdminController
             Response::error('Failed to update campus settings: ' . $e->getMessage(), null, 500);
         }
     }
+    /**
+     * Get system settings
+     */
+    public function getSystemSettings()
+    {
+        Auth::requireAdmin();
+
+        try {
+            $settings = $this->settingsModel->getAll();
+            
+            // Filter out sensitive or unrelated settings if needed, 
+            // but for now we return all settings except maybe internal ones
+            // We specifically want: late_threshold, absent_threshold, allow_override, require_approval, send_email_notifications
+            
+            Response::success('System settings retrieved', $settings);
+        } catch (Exception $e) {
+            Response::error('Failed to retrieve system settings: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    /**
+     * Update system settings
+     */
+    public function updateSystemSettings()
+    {
+        Auth::requireAdmin();
+
+        $data = json_decode(file_get_contents('php://input'), true) ?? [];
+
+        // Validate input
+        $errors = Validator::validate($data, [
+            'late_threshold' => 'required|numeric|min:1',
+            'absent_threshold' => 'required|numeric|min:1',
+            'allow_override' => 'boolean',
+            'require_approval' => 'boolean',
+            'send_email_notifications' => 'boolean'
+        ]);
+
+        if (!empty($errors)) {
+            Response::validationError($errors);
+        }
+
+        try {
+            $settingsToUpdate = [
+                'late_threshold' => [
+                    'value' => (int)$data['late_threshold'],
+                    'type' => 'integer'
+                ],
+                'absent_threshold' => [
+                    'value' => (int)$data['absent_threshold'],
+                    'type' => 'integer'
+                ],
+                'allow_override' => [
+                    'value' => isset($data['allow_override']) && $data['allow_override'] ? 1 : 0,
+                    'type' => 'boolean'
+                ],
+                'require_approval' => [
+                    'value' => isset($data['require_approval']) && $data['require_approval'] ? 1 : 0,
+                    'type' => 'boolean'
+                ],
+                'send_email_notifications' => [
+                    'value' => isset($data['send_email_notifications']) && $data['send_email_notifications'] ? 1 : 0,
+                    'type' => 'boolean'
+                ]
+            ];
+
+            $this->settingsModel->setMultiple($settingsToUpdate);
+            
+            Response::success('System settings updated successfully');
+        } catch (Exception $e) {
+            Response::error('Failed to update system settings: ' . $e->getMessage(), null, 500);
+        }
+    }
 }
