@@ -84,6 +84,7 @@
 .modal-body {
   padding: var(--spacing-lg);
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: calc(90vh - 8rem);
 }
 

@@ -260,6 +260,15 @@ if ($userData) {
   <script src="../../assets/js/global.js"></script>
   <script src="../../assets/js/auth.js"></script>
   <script>
+    // Helper function to convert 24-hour time to 12-hour format with AM/PM
+    function formatTimeTo12Hour(time24) {
+      if (!time24) return '';
+      const [hours, minutes] = time24.split(':');
+      const hour = parseInt(hours, 10);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12;
+      return `${hour12}:${minutes} ${ampm}`;
+    }
     // Check authentication on page load
     if (!AuthAPI.isAuthenticated()) {
       window.location.href = '/cics-attendance-system/login.php';
@@ -345,7 +354,7 @@ if ($userData) {
           daySchedule.forEach(cls => {
             classesHtml += `
               <div class="class-item">
-                <span class="class-time">${cls.start_time} - ${cls.end_time}</span>
+                <span class="class-time">${formatTimeTo12Hour(cls.start_time)} - ${formatTimeTo12Hour(cls.end_time)}</span>
                 <div class="class-subject">${cls.subject_name}</div>
                 <div class="class-details">
                   <div class="class-detail-row">
@@ -429,6 +438,7 @@ if ($userData) {
     // Load data on page load
     loadDashboardData();
     loadWeeklySchedule();
+    loadTodaysSchedule();
   </script>
 </body>
 
