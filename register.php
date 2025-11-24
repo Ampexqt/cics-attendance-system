@@ -196,7 +196,7 @@
           Thank you for registering. Your account is pending approval from the administrator. You will be notified once your account has been approved.
         </p>
         <div style="display: flex; gap: var(--spacing-md);">
-          <button type="button" class="btn btn-secondary" onclick=\"window.location.href='./index.php' \">Return Home</button>
+          <button type="button" class="btn btn-secondary" onclick="window.location.href='./index.php'">Return Home</button>
           <button type="button" class="btn btn-primary" onclick="window.location.href='login.php'">Go to Login</button>
         </div>
       </div>
