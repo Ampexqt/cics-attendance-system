@@ -140,4 +140,115 @@ class Helper
     {
         return bin2hex(random_bytes($length / 2));
     }
+
+    /**
+     * Parse a serialized schedule string into structured entries.
+     *
+     * @param string|null $schedule
+     * @return array<int, array<string,string>>
+     */
+    public static function parseScheduleString(?string $schedule): array
+    {
+        if (empty($schedule)) {
+            return [];
+        }
+
+        $entries = array_filter(array_map('trim', explode(';', $schedule)));
+        $pattern = '/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s+(\d{1,2}:\d{2})\s*(AM|PM)\s*-\s*(\d{1,2}:\d{2})\s*(AM|PM)$/i';
+        $parsed = [];
+
+        foreach ($entries as $entry) {
+            if (!preg_match($pattern, $entry, $matches)) {
+                continue;
+            }
+
+            $day = ucfirst(strtolower($matches[1]));
+            $start24 = self::convertScheduleTimeTo24Hour($matches[2], $matches[3]);
+            $end24 = self::convertScheduleTimeTo24Hour($matches[4], $matches[5]);
+
+            if (!$start24 || !$end24) {
+                continue;
+            }
+
+            $parsed[] = [
+                'day' => $day,
+                'start_time_12h' => strtoupper(trim($matches[2] . ' ' . $matches[3])),
+                'end_time_12h' => strtoupper(trim($matches[4] . ' ' . $matches[5])),
+                'start_time' => $start24,
+                'end_time' => $end24,
+            ];
+        }
+
+        return $parsed;
+    }
+
+    /**
+     * Get the schedule window for a specific calendar date.
+     *
+     * @param string|null $schedule
+     * @param string $date Y-m-d formatted date
+     * @return array<string,string>|null
+     */
+    public static function getScheduleWindowForDate(?string $schedule, string $date): ?array
+    {
+        $entries = self::parseScheduleString($schedule);
+        if (empty($entries)) {
+            return null;
+        }
+
+        $dayName = date('l', strtotime($date));
+        foreach ($entries as $entry) {
+            if ($entry['day'] === $dayName) {
+                return $entry;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Determine if a given timestamp sits within the configured schedule window.
+     *
+     * @param string|null $schedule
+     * @param string|null $dateTime Y-m-d H:i:s timestamp (defaults to now)
+     * @param int $graceBefore Minutes allowed before the scheduled start
+     * @param int $graceAfter Minutes allowed after the scheduled end
+     * @return bool
+     */
+    public static function isWithinScheduleWindow(?string $schedule, ?string $dateTime = null, int $graceBefore = 0, int $graceAfter = 0): bool
+    {
+        $dateTimeString = $dateTime ?? self::now();
+        $dateTimeObj = new DateTime($dateTimeString);
+        $window = self::getScheduleWindowForDate($schedule, $dateTimeObj->format('Y-m-d'));
+
+        if (!$window) {
+            return false;
+        }
+
+        $start = new DateTime($dateTimeObj->format('Y-m-d') . ' ' . $window['start_time']);
+        $end = new DateTime($dateTimeObj->format('Y-m-d') . ' ' . $window['end_time']);
+
+        if ($graceBefore > 0) {
+            $start->modify("-{$graceBefore} minutes");
+        }
+
+        if ($graceAfter > 0) {
+            $end->modify("+{$graceAfter} minutes");
+        }
+
+        return $dateTimeObj >= $start && $dateTimeObj <= $end;
+    }
+
+    /**
+     * Convert a 12-hour time token into 24-hour (HH:MM:SS) format.
+     *
+     * @param string $time
+     * @param string $meridiem
+     * @return string|null
+     */
+    private static function convertScheduleTimeTo24Hour(string $time, string $meridiem): ?string
+    {
+        $dateTime = DateTime::createFromFormat('g:i A', strtoupper(trim($time . ' ' . $meridiem)));
+        return $dateTime ? $dateTime->format('H:i:s') : null;
+    }
 }

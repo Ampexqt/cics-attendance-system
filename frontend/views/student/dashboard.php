@@ -260,6 +260,7 @@ if ($userData) {
   <script src="../../assets/js/global.js"></script>
   <script src="../../assets/js/auth.js"></script>
   <script>
+    let studentActiveSession = null;
     // Helper function to convert 24-hour time to 12-hour format with AM/PM
     function formatTimeTo12Hour(time24) {
       if (!time24) return '';
@@ -388,17 +389,17 @@ if ($userData) {
         grid.appendChild(dayElement);
       });
     }
-    
+
     // Function to load today's schedule
     async function loadTodaysSchedule() {
       const scheduleList = document.getElementById('scheduleList');
-      
+
       try {
         // First, get today's day name (e.g., 'Monday', 'Tuesday')
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const today = new Date();
         const todayName = days[today.getDay()];
-        
+
         // Get the weekly schedule
         const response = await fetch('/cics-attendance-system/backend/api/student/schedule', {
           credentials: 'include'
@@ -408,7 +409,7 @@ if ($userData) {
           const json = await response.json();
           if (json.success && json.data) {
             const todaySchedule = json.data[todayName] || [];
-            
+
             if (todaySchedule.length > 0) {
               let html = '';
               todaySchedule.forEach(cls => {
@@ -449,18 +450,185 @@ if ($userData) {
       }
     }
 
+    async function loadActiveSessionState() {
+      const statusContainer = document.querySelector('.attendance-status');
+      const button = document.getElementById('attendanceBtn');
+
+      try {
+        const response = await fetch('/cics-attendance-system/backend/api/attendance/student-active-session', {
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error(`Server returned ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (response.ok && result.success && result.data) {
+          studentActiveSession = result.data;
+          button.disabled = false;
+          const subject = result.data.subject || {};
+          const windowLabel = result.data.window?.label || 'Session in progress';
+
+          statusContainer.innerHTML = `
+            <div class="status-item success">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>${subject.name || 'Active Session'} (${subject.code || 'N/A'})</span>
+            </div>
+            <div class="status-item info">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>${windowLabel}</span>
+            </div>
+          `;
+        } else {
+          studentActiveSession = null;
+          button.disabled = true;
+          statusContainer.innerHTML = `
+            <div class="status-item info">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0" />
+              </svg>
+              <span>No active session available</span>
+            </div>
+            <div class="status-item warning">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12z" />
+              </svg>
+              <span>Wait for your instructor to start the session</span>
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Error loading active session:', error);
+        studentActiveSession = null;
+        button.disabled = true;
+        statusContainer.innerHTML = `
+          <div class="status-item warning">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12z" />
+            </svg>
+            <span>Unable to load active session. Please refresh.</span>
+          </div>
+        `;
+      }
+    }
+
     // Handle attendance button
     document.getElementById('attendanceBtn').addEventListener('click', async function() {
+      if (!studentActiveSession || !studentActiveSession.session) {
+        Toast.error('No active session detected. Please wait for your instructor to start the class.', 'No Session');
+        return;
+      }
+
       Toast.info('Processing attendance...', 'Please wait');
 
       try {
-        // Get GPS location
         if (!navigator.geolocation) {
           Toast.error('Geolocation is not supported by your browser', 'Error');
           return;
         }
 
-        navigator.geolocation.getCurrentPosition(async (position) => {
+        // Robust geolocation with high accuracy
+        const gpsOptions = {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        };
+
+        let watchId;
+        let bestPosition = null;
+        let restartAttempted = false;
+        const startTime = Date.now();
+
+        // Show loading state
+        const originalBtnText = document.getElementById('attendanceBtn').innerText;
+        document.getElementById('attendanceBtn').disabled = true;
+        document.getElementById('attendanceBtn').innerHTML = '<span class="spinner" style="width: 16px; height: 16px; display:inline-block;"></span> Getting location...';
+
+        // Set timeout to stop watching after maxWaitTime
+        let timeoutId = setTimeout(() => {
+          finish(bestPosition);
+        }, 10000);
+
+        function startWatch() {
+          if (watchId) navigator.geolocation.clearWatch(watchId);
+
+          watchId = navigator.geolocation.watchPosition(
+            (position) => {
+              const accuracy = position.coords.accuracy;
+              const elapsed = Date.now() - startTime;
+
+              // Keep the most accurate position
+              if (!bestPosition || accuracy < bestPosition.coords.accuracy) {
+                bestPosition = position;
+              }
+
+              // Restart strategy
+              if (!restartAttempted && elapsed > 3000 && bestPosition && bestPosition.coords.accuracy > 1000) {
+                restartAttempted = true;
+                document.getElementById('attendanceBtn').innerHTML = '<span class="spinner" style="width: 16px; height: 16px; display:inline-block;"></span> Retrying GPS...';
+                startWatch();
+                return;
+              }
+
+              // Adaptive Strategy
+              if (accuracy <= 20) {
+                finish(bestPosition);
+              } else if (accuracy <= 50 && elapsed > 1000) {
+                finish(bestPosition);
+              } else if (accuracy <= 100 && elapsed > 3000) {
+                finish(bestPosition);
+              } else if (accuracy <= 200 && elapsed > 5000) {
+                finish(bestPosition);
+              }
+            },
+            (error) => {
+              if (error.code === error.TIMEOUT) return;
+
+              if (!bestPosition) {
+                clearTimeout(timeoutId);
+                handleGeoError(error);
+              }
+            },
+            gpsOptions
+          );
+        }
+
+        function finish(position) {
+          clearTimeout(timeoutId);
+          if (watchId) navigator.geolocation.clearWatch(watchId);
+          document.getElementById('attendanceBtn').disabled = false;
+          document.getElementById('attendanceBtn').innerText = originalBtnText;
+
+          if (position) {
+            submitAttendance(position);
+          } else {
+            Toast.error('Unable to get accurate location. Please check GPS settings.', 'Location Error');
+          }
+        }
+
+        function handleGeoError(error) {
+          document.getElementById('attendanceBtn').disabled = false;
+          document.getElementById('attendanceBtn').innerText = originalBtnText;
+
+          if (error.code === error.PERMISSION_DENIED) {
+            Toast.error('Location permission denied.', 'Error');
+          } else {
+            Toast.error('Location unavailable.', 'Error');
+          }
+        }
+
+        // Start
+        startWatch();
+
+        async function submitAttendance(position) {
           try {
             const response = await fetch('/cics-attendance-system/backend/api/attendance/mark', {
               method: 'POST',
@@ -469,9 +637,10 @@ if ($userData) {
               },
               credentials: 'include',
               body: JSON.stringify({
-                session_id: 1, // This should be dynamic based on current session
+                session_id: studentActiveSession.session.id,
                 latitude: position.coords.latitude,
-                longitude: position.coords.longitude
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy // Send accuracy for logging/verification
               })
             });
 
@@ -479,17 +648,15 @@ if ($userData) {
 
             if (data.success) {
               Toast.success('Attendance marked successfully!', 'Success');
-              // Reload summary
               loadDashboardData();
+              loadActiveSessionState();
             } else {
               Toast.error(data.message || 'Failed to mark attendance', 'Error');
             }
           } catch (error) {
             Toast.error('Failed to mark attendance. Please try again.', 'Error');
           }
-        }, (error) => {
-          Toast.error('Unable to get your location. Please enable location services.', 'Error');
-        });
+        }
       } catch (error) {
         Toast.error('An error occurred. Please try again.', 'Error');
       }
@@ -499,6 +666,7 @@ if ($userData) {
     loadDashboardData();
     loadWeeklySchedule();
     loadTodaysSchedule();
+    loadActiveSessionState();
   </script>
 </body>
 

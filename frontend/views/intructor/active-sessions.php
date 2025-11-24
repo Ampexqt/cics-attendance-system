@@ -285,7 +285,9 @@ function getStatusBadgeClass($status)
         button.addEventListener('click', () => {
           const subjectId = button.dataset.subjectId;
           if (!subjectId) return;
-          performSessionAction(button, 'start-session', { subject_id: subjectId }, 'Attendance session started.');
+          performSessionAction(button, 'start-session', {
+            subject_id: subjectId
+          }, 'Attendance session started.');
         });
       });
 
@@ -296,12 +298,14 @@ function getStatusBadgeClass($status)
           }
           const sessionId = button.dataset.sessionId;
           if (!sessionId) return;
-          performSessionAction(button, 'end-session', { session_id: sessionId }, 'Attendance session ended.');
+          performSessionAction(button, 'end-session', {
+            session_id: sessionId
+          }, 'Attendance session ended.');
         });
       });
     });
   </script>
+  <script src="../../assets/js/auto-end-sessions.js"></script>
 </body>
 
 </html>
-

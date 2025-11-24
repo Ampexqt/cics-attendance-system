@@ -5,6 +5,7 @@ $activePage = 'campus';
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,45 +23,45 @@ $activePage = 'campus';
       margin-bottom: 2rem;
       align-items: stretch;
     }
-    
+
     @media (max-width: 1200px) {
       .two-column-layout {
         grid-template-columns: 1fr;
       }
     }
-    
+
     .right-column {
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
     }
-    
+
     .map-card {
       display: flex;
       flex-direction: column;
       height: 100%;
     }
-    
+
     .map-card .card-body {
       display: flex;
       flex-direction: column;
       flex: 1;
     }
-    
+
     #campusMap {
       flex: 1;
       min-height: 500px;
       width: 100%;
       border-radius: var(--border-radius);
     }
-    
+
     .map-container {
       position: relative;
       flex: 1;
       display: flex;
       flex-direction: column;
     }
-    
+
     .map-loading {
       position: absolute;
       top: 50%;
@@ -71,31 +72,31 @@ $activePage = 'campus';
       background: rgba(255, 255, 255, 0.95);
       padding: 2rem;
       border-radius: var(--border-radius);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
-    
+
     .current-settings-card {
       height: auto;
     }
-    
+
     .current-settings-card .card-body {
       padding: 1.5rem;
     }
-    
+
     .settings-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
       margin-top: 1rem;
     }
-    
+
     .setting-item {
       background: var(--color-bg-secondary);
       padding: 1rem;
       border-radius: 8px;
       border: 1px solid var(--color-border);
     }
-    
+
     .setting-label {
       font-size: 0.75rem;
       color: var(--color-text-muted);
@@ -104,42 +105,42 @@ $activePage = 'campus';
       letter-spacing: 0.5px;
       font-weight: 500;
     }
-    
+
     .setting-value {
       font-size: 1.125rem;
       font-weight: 700;
       font-family: 'Courier New', monospace;
       color: var(--color-primary);
     }
-    
+
     .gps-form-card {
       height: auto;
       flex: 1;
     }
-    
+
     .gps-form-card .card-body {
       padding: 1.5rem;
     }
-    
+
     .form-field {
       margin-bottom: 1rem;
     }
-    
+
     .form-field:last-of-type {
       margin-bottom: 0;
     }
-    
+
     .radius-slider-container {
       display: flex;
       align-items: center;
       gap: 1rem;
       margin-top: 0.5rem;
     }
-    
+
     .radius-slider {
       flex: 1;
     }
-    
+
     .radius-value {
       min-width: 70px;
       text-align: center;
@@ -147,7 +148,7 @@ $activePage = 'campus';
       color: var(--color-primary);
       font-size: 1.125rem;
     }
-    
+
     .form-actions {
       display: flex;
       gap: 0.75rem;
@@ -155,16 +156,17 @@ $activePage = 'campus';
       padding-top: 1.5rem;
       border-top: 1px solid var(--color-border);
     }
-    
+
     .btn-get-location {
       flex: 1;
     }
-    
+
     .btn-save {
       flex: 1;
     }
   </style>
 </head>
+
 <body>
   <div class="main-layout">
     <!-- Sidebar -->
@@ -189,7 +191,7 @@ $activePage = 'campus';
             <div class="card-body">
               <h3 class="card-title">Campus Map</h3>
               <p class="text-muted" style="margin-bottom: 1rem;">Drag the marker to set the campus center. The blue circle shows the attendance coverage area.</p>
-              
+
               <div class="map-container">
                 <div class="map-loading" id="mapLoading">
                   <div class="spinner"></div>
@@ -238,52 +240,52 @@ $activePage = 'campus';
                   </svg>
                   GPS Location Settings
                 </h3>
-                
+
                 <form id="campusSettingsForm">
-              <div class="form-grid">
-                <div class="form-field form-group">
-                  <label for="campusLatitude">Campus Latitude <span class="text-danger">*</span></label>
-                  <input type="number" id="campusLatitude" name="campus_latitude" class="form-control" step="0.000001" min="-90" max="90" required>
-                  <small class="text-muted">Range: -90 to 90</small>
-                </div>
-                <div class="form-field form-group">
-                  <label for="campusLongitude">Campus Longitude <span class="text-danger">*</span></label>
-                  <input type="number" id="campusLongitude" name="campus_longitude" class="form-control" step="0.000001" min="-180" max="180" required>
-                  <small class="text-muted">Range: -180 to 180</small>
-                </div>
-              </div>
+                  <div class="form-grid">
+                    <div class="form-field form-group">
+                      <label for="campusLatitude">Campus Latitude <span class="text-danger">*</span></label>
+                      <input type="number" id="campusLatitude" name="campus_latitude" class="form-control" step="0.000001" min="-90" max="90" required>
+                      <small class="text-muted">Range: -90 to 90</small>
+                    </div>
+                    <div class="form-field form-group">
+                      <label for="campusLongitude">Campus Longitude <span class="text-danger">*</span></label>
+                      <input type="number" id="campusLongitude" name="campus_longitude" class="form-control" step="0.000001" min="-180" max="180" required>
+                      <small class="text-muted">Range: -180 to 180</small>
+                    </div>
+                  </div>
 
-              <div class="form-field form-group">
-                <label for="campusRadius">Attendance Radius (meters) <span class="text-danger">*</span></label>
-                <div class="radius-slider-container">
-                  <input type="range" id="campusRadius" name="campus_radius" class="radius-slider" min="10" max="1000" step="10" value="100">
-                  <span class="radius-value" id="radiusValue">100m</span>
-                </div>
-                <small class="text-muted">Students must be within this radius to mark attendance</small>
-              </div>
+                  <div class="form-field form-group">
+                    <label for="campusRadius">Attendance Radius (meters) <span class="text-danger">*</span></label>
+                    <div class="radius-slider-container">
+                      <input type="range" id="campusRadius" name="campus_radius" class="radius-slider" min="10" max="1000" step="10" value="100">
+                      <span class="radius-value" id="radiusValue">100m</span>
+                    </div>
+                    <small class="text-muted">Students must be within this radius to mark attendance</small>
+                  </div>
 
-              <div class="form-actions">
-                <button type="button" class="btn btn-outline btn-get-location" id="getCurrentLocationBtn">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 6.627-5.373 12-12 12s-12-5.373-12-12 5.373-12 12-12 12 5.373 12 12z" />
-                  </svg>
-                  Get My Location
-                </button>
-                <button type="submit" class="btn btn-primary btn-save" id="saveSettingsBtn">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                  </svg>
-                  Save Settings
-                </button>
+                  <div class="form-actions">
+                    <button type="button" class="btn btn-outline btn-get-location" id="getCurrentLocationBtn">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 6.627-5.373 12-12 12s-12-5.373-12-12 5.373-12 12-12 12 5.373 12 12z" />
+                      </svg>
+                      Get My Location
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-save" id="saveSettingsBtn">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                      Save Settings
+                    </button>
+                  </div>
+                </form>
               </div>
-            </form>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </main>
-</div>
+    </main>
+  </div>
 
   <?php include 'includes/scripts.php'; ?>
   <!-- Leaflet JS -->
@@ -291,7 +293,7 @@ $activePage = 'campus';
   <script>
     (function() {
       const API_BASE = '/cics-attendance-system/backend/api';
-      
+
       let map, marker, circle;
       const state = {
         latitude: 7.1117,
@@ -450,32 +452,84 @@ $activePage = 'campus';
           return;
         }
 
-        elements.getCurrentLocationBtn.disabled = true;
-        elements.getCurrentLocationBtn.innerHTML = '<span class="spinner" style="width: 16px; height: 16px;"></span> Getting precise location...';
-
-        let watchId;
-        let bestPosition = null;
-        let attempts = 0;
-        const startTime = Date.now();
-        const maxWaitTime = 5000; // Reduced to 5 seconds
-
         // GPS options for maximum accuracy
         const gpsOptions = {
           enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 2000 // Accept positions up to 2 seconds old (faster)
+          timeout: 10000, // Reduced to 10 seconds
+          maximumAge: 0
         };
 
+        let watchId;
+        let bestPosition = null;
+        let restartAttempted = false;
+        let attempts = 0;
+        const startTime = Date.now();
+
+        // Initial button state
+        elements.getCurrentLocationBtn.disabled = true;
+        elements.getCurrentLocationBtn.innerHTML = '<span class="spinner" style="width: 16px; height: 16px;"></span> Initializing GPS...';
+
         // Set timeout to stop watching after maxWaitTime
-        const timeoutId = setTimeout(() => {
+        let timeoutId = setTimeout(() => {
           finish(bestPosition);
-        }, maxWaitTime);
+        }, 10000);
+
+        function startWatch() {
+          if (watchId) navigator.geolocation.clearWatch(watchId);
+
+          watchId = navigator.geolocation.watchPosition(
+            (position) => {
+              attempts++;
+              const accuracy = position.coords.accuracy;
+              const elapsed = Date.now() - startTime;
+
+              // Keep the most accurate position
+              if (!bestPosition || accuracy < bestPosition.coords.accuracy) {
+                bestPosition = position;
+              }
+
+              // Restart strategy: Faster trigger (3s) if accuracy is still terrible
+              if (!restartAttempted && elapsed > 3000 && bestPosition && bestPosition.coords.accuracy > 1000) {
+                restartAttempted = true;
+                console.log("Restarting GPS watcher to force hardware lock...");
+                elements.getCurrentLocationBtn.innerHTML = '<span class="spinner" style="width: 16px; height: 16px;"></span> Retrying GPS lock...';
+                startWatch(); // Recursive restart
+                return;
+              }
+
+              // Adaptive Strategy (Fast & Accurate):
+              if (accuracy <= 20) {
+                finish(bestPosition);
+              } else if (accuracy <= 50 && elapsed > 1000) {
+                finish(bestPosition);
+              } else if (accuracy <= 100 && elapsed > 3000) {
+                finish(bestPosition);
+              } else if (accuracy <= 200 && elapsed > 5000) {
+                finish(bestPosition);
+              } else {
+                // Update button with current accuracy
+                elements.getCurrentLocationBtn.innerHTML = `<span class="spinner" style="width: 16px; height: 16px;"></span> Improving... (${Math.round(accuracy)}m)`;
+              }
+            },
+            (error) => {
+              // If it's a timeout error from the browser's internal timer, ignore it and keep waiting until OUR timer expires
+              if (error.code === error.TIMEOUT) return;
+
+              // For other errors, if we have no position yet, fail.
+              if (!bestPosition) {
+                clearTimeout(timeoutId);
+                handleGeoError(error);
+              }
+            },
+            gpsOptions
+          );
+        }
 
         // Helper to finish and clean up
         function finish(position) {
           clearTimeout(timeoutId);
           if (watchId) navigator.geolocation.clearWatch(watchId);
-          
+
           if (position) {
             applyPosition(position);
           } else {
@@ -484,54 +538,22 @@ $activePage = 'campus';
           }
         }
 
-        // Watch position to get multiple readings
-        watchId = navigator.geolocation.watchPosition(
-          (position) => {
-            attempts++;
-            const accuracy = position.coords.accuracy;
-            const elapsed = Date.now() - startTime;
+        function handleGeoError(error) {
+          let errorMessage = 'Unable to get your location';
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = 'Location permission denied. Please allow location access.';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = 'Location unavailable. Check GPS.';
+              break;
+          }
+          Toast.error(errorMessage);
+          resetLocationButton();
+        }
 
-            // Keep the most accurate position
-            if (!bestPosition || accuracy < bestPosition.coords.accuracy) {
-              bestPosition = position;
-            }
-
-            // Adaptive Strategy (Instant Speed):
-            // 1. Good enough (< 200m) -> Stop immediately (Instant for you)
-            // 2. Usable (< 1000m) AND > 2 seconds elapsed -> Stop
-            
-            if (accuracy <= 200) {
-              finish(bestPosition);
-            } else if (accuracy <= 1000 && elapsed > 2000) {
-              finish(bestPosition);
-            } else {
-              // Update button with current accuracy
-              elements.getCurrentLocationBtn.innerHTML = `<span class="spinner" style="width: 16px; height: 16px;"></span> Improving... (${Math.round(accuracy)}m)`;
-            }
-          },
-          (error) => {
-            clearTimeout(timeoutId);
-            if (watchId) {
-              navigator.geolocation.clearWatch(watchId);
-            }
-
-            let errorMessage = 'Unable to get your location';
-            switch(error.code) {
-              case error.PERMISSION_DENIED:
-                errorMessage = 'Location permission denied. Please allow location access in your browser settings.';
-                break;
-              case error.POSITION_UNAVAILABLE:
-                errorMessage = 'Location information is unavailable. Make sure GPS is enabled.';
-                break;
-              case error.TIMEOUT:
-                errorMessage = 'Location request timed out. Please try again.';
-                break;
-            }
-            Toast.error(errorMessage);
-            resetLocationButton();
-          },
-          gpsOptions
-        );
+        // Start the process
+        startWatch();
 
         function applyPosition(position) {
           const accuracy = position.coords.accuracy;
@@ -540,24 +562,25 @@ $activePage = 'campus';
             position.coords.longitude,
             state.radius
           );
-          
+
           let accuracyMessage = `Location updated! Accuracy: ${Math.round(accuracy)}m`;
-          
-          // Adjusted thresholds for desktop/WiFi users
+
           if (accuracy < 50) {
             accuracyMessage += ' (Excellent)';
             Toast.success(accuracyMessage);
           } else if (accuracy < 200) {
             accuracyMessage += ' (Good)';
             Toast.success(accuracyMessage);
-          } else if (accuracy < 500) {
+          } else if (accuracy < 1000) {
             accuracyMessage += ' (Fair)';
             Toast.info(accuracyMessage);
           } else {
-            accuracyMessage += ' (Low accuracy)';
+            // Explicit feedback for low accuracy (likely IP-based)
+            accuracyMessage += ' (Approximate)';
             Toast.warning(accuracyMessage);
+            Toast.info('Note: Low accuracy detected. This is common on devices without GPS (like laptops). Please drag the map marker to your exact location.');
           }
-          
+
           resetLocationButton();
         }
 
@@ -591,7 +614,9 @@ $activePage = 'campus';
         try {
           const response = await fetch(`${API_BASE}/admin/settings/campus`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json'
+            },
             credentials: 'include',
             body: JSON.stringify(payload)
           });
@@ -618,4 +643,5 @@ $activePage = 'campus';
     })();
   </script>
 </body>
+
 </html>

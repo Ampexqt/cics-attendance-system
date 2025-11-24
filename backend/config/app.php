@@ -47,6 +47,8 @@ return [
         'late_threshold' => 15, // minutes
         'absent_threshold' => 30, // minutes
         'allow_override' => true,
+        'session_grace_before' => 30, // minutes instructors can start early
+        'session_grace_after' => 30, // minutes instructors can extend late
     ],
 ];
 

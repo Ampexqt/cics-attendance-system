@@ -140,6 +140,14 @@ try {
                     }
                     break;
 
+                case 'student-active-session':
+                    if ($method === 'GET') {
+                        $attendanceController->getStudentActiveSession();
+                    } else {
+                        Response::error('Method not allowed', null, 405);
+                    }
+                    break;
+
                 default:
                     Response::notFound('Attendance endpoint not found');
             }
