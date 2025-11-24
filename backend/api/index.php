@@ -1,4 +1,5 @@
 <?php
+
 /**
  * API Router
  * CICS Attendance System
@@ -21,7 +22,7 @@ spl_autoload_register(function ($class) {
         __DIR__ . '/../utils/',
         __DIR__ . '/../database/',
     ];
-    
+
     foreach ($paths as $path) {
         $file = $path . $class . '.php';
         if (file_exists($file)) {
@@ -58,7 +59,7 @@ try {
                         Response::error('Method not allowed', null, 405);
                     }
                     break;
-                    
+
                 case 'register':
                     if ($method === 'POST') {
                         $authController->register();
@@ -66,7 +67,7 @@ try {
                         Response::error('Method not allowed', null, 405);
                     }
                     break;
-                    
+
                 case 'logout':
                     if ($method === 'POST') {
                         $authController->logout();
@@ -74,7 +75,7 @@ try {
                         Response::error('Method not allowed', null, 405);
                     }
                     break;
-                    
+
                 case 'me':
                     if ($method === 'GET') {
                         $authController->me();
@@ -82,12 +83,12 @@ try {
                         Response::error('Method not allowed', null, 405);
                     }
                     break;
-                    
+
                 default:
                     Response::notFound('Auth endpoint not found');
             }
             break;
-            
+
         case 'attendance':
             $attendanceController = new AttendanceController();
             switch ($action) {
@@ -98,7 +99,7 @@ try {
                         Response::error('Method not allowed', null, 405);
                     }
                     break;
-                    
+
                 case 'timeout':
                     if ($method === 'POST') {
                         $attendanceController->markTimeOut();
@@ -106,7 +107,7 @@ try {
                         Response::error('Method not allowed', null, 405);
                     }
                     break;
-                    
+
                 case 'records':
                     if ($method === 'GET') {
                         $attendanceController->getRecords();
@@ -114,7 +115,7 @@ try {
                         Response::error('Method not allowed', null, 405);
                     }
                     break;
-                    
+
                 case 'summary':
                     if ($method === 'GET') {
                         $attendanceController->getSummary();
@@ -122,12 +123,28 @@ try {
                         Response::error('Method not allowed', null, 405);
                     }
                     break;
-                    
+
                 default:
                     Response::notFound('Attendance endpoint not found');
             }
             break;
-            
+
+        case 'student':
+            $studentController = new StudentController();
+            switch ($action) {
+                case 'schedule':
+                    if ($method === 'GET') {
+                        $studentController->getSchedule();
+                    } else {
+                        Response::error('Method not allowed', null, 405);
+                    }
+                    break;
+
+                default:
+                    Response::notFound('Student endpoint not found');
+            }
+            break;
+
         case 'admin':
             $adminController = new AdminController();
             switch ($action) {
@@ -138,7 +155,7 @@ try {
                         Response::error('Method not allowed', null, 405);
                     }
                     break;
-                    
+
                 case 'pending':
                     if ($method === 'GET') {
                         $adminController->getPendingRegistrations();
@@ -146,7 +163,7 @@ try {
                         Response::error('Method not allowed', null, 405);
                     }
                     break;
-                    
+
                 case 'students':
                     if ($method === 'GET') {
                         $adminController->getAllStudents();
@@ -190,7 +207,7 @@ try {
                         Response::error('User ID is required', null, 400);
                     }
                     break;
-                    
+
                 case 'update-student':
                     if ($method === 'PUT') {
                         $adminController->updateStudent();
@@ -198,7 +215,7 @@ try {
                         Response::error('Method not allowed', null, 405);
                     }
                     break;
-                    
+
                 case 'delete-student':
                     if ($method === 'DELETE') {
                         $adminController->deleteStudent();
@@ -206,7 +223,7 @@ try {
                         Response::error('Method not allowed', null, 405);
                     }
                     break;
-                    
+
                 case 'dashboard-stats':
                     if ($method === 'GET') {
                         $adminController->getDashboardStats();
@@ -240,7 +257,7 @@ try {
                         }
                     }
                     break;
-                    
+
                 case 'settings':
                     // Handle settings routes: /admin/settings/campus or /admin/settings/system
                     if (isset($segments[2])) {
@@ -267,12 +284,12 @@ try {
                         Response::notFound('Settings endpoint not found');
                     }
                     break;
-                    
+
                 default:
                     Response::notFound('Admin endpoint not found');
             }
             break;
-            
+
         default:
             Response::notFound('API endpoint not found');
     }
@@ -280,4 +297,3 @@ try {
     error_log("API Error: " . $e->getMessage());
     Response::error('Internal server error', null, 500);
 }
-

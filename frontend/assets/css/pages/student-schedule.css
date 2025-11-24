@@ -1,0 +1,136 @@
+/* Student Schedule Styles */
+
+.schedule-card {
+    margin-top: var(--spacing-lg);
+    overflow: hidden;
+}
+
+.schedule-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+}
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+    overflow-x: auto;
+    padding-bottom: var(--spacing-sm);
+    /* For scrollbar */
+}
+
+/* For larger screens, force 5-6 columns if space permits, or use flex for a row layout */
+@media (min-width: 1024px) {
+    .schedule-grid {
+        grid-template-columns: repeat(5, 1fr);
+        /* Mon-Fri */
+    }
+}
+
+.schedule-day {
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    min-width: 200px;
+    /* Ensure columns don't get too narrow */
+    display: flex;
+    flex-direction: column;
+}
+
+.schedule-day-header {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--primary-blue);
+    color: white;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    text-align: center;
+    border-top-left-radius: calc(var(--radius-md) - 1px);
+    border-top-right-radius: calc(var(--radius-md) - 1px);
+}
+
+.schedule-day-body {
+    padding: var(--spacing-sm);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.class-item {
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--accent-gold);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.class-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.class-time {
+    font-size: var(--font-size-xs);
+    color: var(--primary-blue);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.class-subject {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
+}
+
+.class-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+.class-detail-row {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.class-detail-icon {
+    width: 0.75rem;
+    height: 0.75rem;
+    color: var(--text-tertiary);
+}
+
+.empty-day {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
+    text-align: center;
+    padding: var(--spacing-md) 0;
+    font-style: italic;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .schedule-grid {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .schedule-day {
+        min-width: 100%;
+    }
+
+    .schedule-day-body {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: var(--spacing-sm);
+    }
+}
