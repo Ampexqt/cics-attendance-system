@@ -56,18 +56,6 @@
       </button>
     </div>
   </nav>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const logoutBtn = document.getElementById('sidebarLogoutBtn');
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', function() {
-          if (confirm('Are you sure you want to logout?')) {
-            AuthAPI.logout();
-          }
-        });
-      }
-    });
-  </script>
   <div class="sidebar-footer">
     <p>© 2023 ZPPSU CICS<br>Campus Attendance System</p>
   </div>
