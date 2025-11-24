@@ -2,6 +2,8 @@
  * Global JavaScript for CICS Attendance System
  */
 
+const API_BASE = '/cics-attendance-system/backend/api';
+
 // Toast Notification System
 class Toast {
   static container = null;

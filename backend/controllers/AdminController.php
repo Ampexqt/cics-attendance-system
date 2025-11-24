@@ -261,7 +261,7 @@ class AdminController
 
         // Total classes
         $classesCount = $db->fetchOne(
-            "SELECT COUNT(DISTINCT subject_id) as count FROM subjects"
+            "SELECT COUNT(*) as count FROM subjects"
         )['count'];
 
         // Average check-in time

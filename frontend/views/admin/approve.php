@@ -99,8 +99,8 @@ $activePage = 'approve';
         </p>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline btn-sm" onclick="closeApproveModal()">Cancel</button>
-        <button class="btn btn-warning btn-sm" onclick="confirmApprove()">
+        <button class="btn btn-outline" onclick="closeApproveModal()">Cancel</button>
+        <button class="btn btn-success" onclick="confirmApprove()">
           Approve
         </button>
       </div>
@@ -125,8 +125,8 @@ $activePage = 'approve';
         </p>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline btn-sm" onclick="closeRejectModal()">Cancel</button>
-        <button class="btn btn-danger btn-sm" onclick="confirmReject()">
+        <button class="btn btn-outline" onclick="closeRejectModal()">Cancel</button>
+        <button class="btn btn-danger" onclick="confirmReject()">
           Reject
         </button>
       </div>
@@ -208,12 +208,12 @@ $activePage = 'approve';
           <td>${registrationDate}</td>
           <td>
             <div class="action-buttons">
-              <button class="btn-action btn-approve" title="Approve" onclick="approveStudent(${student.user_id})">
+              <button class="btn-icon-square btn-icon--success" title="Approve" onclick="approveStudent(${student.user_id})">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
               </button>
-              <button class="btn-action btn-reject" title="Reject" onclick="rejectStudent(${student.user_id})">
+              <button class="btn-icon-square btn-icon--danger" title="Reject" onclick="rejectStudent(${student.user_id})">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>

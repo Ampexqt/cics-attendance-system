@@ -42,9 +42,9 @@ $activePage = 'dashboard';
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">0</div>
+            <div class="stat-card-value" id="statPendingApprovals">0</div>
             <div class="stat-card-footer">
-              <span>No pending approvals</span>
+              <span id="statPendingLabel">No pending approvals</span>
             </div>
           </div>
 
@@ -57,7 +57,7 @@ $activePage = 'dashboard';
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">0</div>
+            <div class="stat-card-value" id="statActiveInstructors">0</div>
           </div>
 
           <div class="stat-card">
@@ -69,7 +69,7 @@ $activePage = 'dashboard';
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">0</div>
+            <div class="stat-card-value" id="statTotalStudents">0</div>
           </div>
 
           <div class="stat-card">
@@ -81,9 +81,9 @@ $activePage = 'dashboard';
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">0</div>
+            <div class="stat-card-value" id="statActiveSessions">0</div>
             <div class="stat-card-footer">
-              <span>No active sessions</span>
+              <span id="statSessionsLabel">No active sessions</span>
             </div>
           </div>
 
@@ -96,7 +96,7 @@ $activePage = 'dashboard';
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">0</div>
+            <div class="stat-card-value" id="statTotalClasses">0</div>
           </div>
 
           <div class="stat-card">
@@ -108,7 +108,7 @@ $activePage = 'dashboard';
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">--:--</div>
+            <div class="stat-card-value" id="statAvgCheckin">--:--</div>
           </div>
         </div>
 
@@ -162,6 +162,59 @@ $activePage = 'dashboard';
   </div>
 
   <?php include 'includes/scripts.php'; ?>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchDashboardStats();
+    });
+
+    async function fetchDashboardStats() {
+      try {
+        const response = await fetch(`${API_BASE}/admin/dashboard-stats`, {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch stats');
+
+        const result = await response.json();
+        if (result.success) {
+          const stats = result.data;
+          
+          // Update counts
+          document.getElementById('statPendingApprovals').textContent = stats.pending_approvals;
+          document.getElementById('statActiveInstructors').textContent = stats.active_instructors;
+          document.getElementById('statTotalStudents').textContent = stats.students_registered;
+          document.getElementById('statActiveSessions').textContent = stats.attendance_sessions_today;
+          document.getElementById('statTotalClasses').textContent = stats.total_classes;
+          document.getElementById('statAvgCheckin').textContent = stats.average_checkin_time;
+
+          // Update labels
+          const pendingLabel = document.getElementById('statPendingLabel');
+          if (stats.pending_approvals > 0) {
+            pendingLabel.textContent = `${stats.pending_approvals} awaiting review`;
+            pendingLabel.style.color = 'var(--warning-yellow)';
+          } else {
+            pendingLabel.textContent = 'No pending approvals';
+            pendingLabel.style.color = 'var(--text-secondary)';
+          }
+
+          const sessionsLabel = document.getElementById('statSessionsLabel');
+          if (stats.attendance_sessions_today > 0) {
+            sessionsLabel.textContent = `${stats.attendance_sessions_today} sessions active`;
+            sessionsLabel.style.color = 'var(--success-green)';
+          } else {
+            sessionsLabel.textContent = 'No active sessions';
+            sessionsLabel.style.color = 'var(--text-secondary)';
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+        Toast.error('Failed to load dashboard statistics');
+      }
+    }
+  </script>
 </body>
 
 </html>
