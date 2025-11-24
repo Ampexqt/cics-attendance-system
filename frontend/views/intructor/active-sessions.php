@@ -55,16 +55,33 @@ function formatDurationLabel(?string $timeIn)
     return '—';
   }
 
-  $timeInObj = new DateTime($timeIn);
-  $now = new DateTime();
-  $interval = $timeInObj->diff($now);
+  try {
+    $timeInObj = new DateTime($timeIn);
+    $now = new DateTime();
 
-  $minutes = ($interval->days * 24 * 60) + ($interval->h * 60) + $interval->i;
-  if ($minutes <= 0) {
-    return 'Just now';
+    // Check if time_in is in the future
+    if ($timeInObj > $now) {
+      return 'Just now';
+    }
+
+    $interval = $timeInObj->diff($now);
+
+    // Calculate total minutes including days
+    $totalMinutes = ($interval->days * 24 * 60) + ($interval->h * 60) + $interval->i;
+
+    // If duration is > 5 hours (300 mins), assume stale/forgotten session
+    if ($totalMinutes > 300) {
+      return '—';
+    }
+
+    if ($totalMinutes <= 0) {
+      return 'Just now';
+    }
+
+    return "{$totalMinutes} mins";
+  } catch (Exception $e) {
+    return '—';
   }
-
-  return "{$minutes} mins";
 }
 
 function getStatusBadgeClass($status)
@@ -163,7 +180,10 @@ function getStatusBadgeClass($status)
                         End Session
                       </button>
                     <?php else: ?>
-                      <button class="btn btn-primary btn-sm start-session-btn" data-subject-id="<?php echo $subject['id']; ?>" data-loading-text="Starting...">
+                      <button class="btn btn-primary btn-sm start-session-btn"
+                        data-subject-id="<?php echo $subject['id']; ?>"
+                        data-schedule="<?php echo htmlspecialchars($scheduleLabel); ?>"
+                        data-loading-text="Starting...">
                         Start Session
                       </button>
                     <?php endif; ?>
@@ -217,7 +237,18 @@ function getStatusBadgeClass($status)
                         <?php foreach ($students as $student):
                           $fullName = trim($student['first_name'] . ' ' . $student['last_name']);
                           $yearLabel = formatYearLevelLabel((int) $student['year_level']);
-                          $timeInLabel = $student['time_in'] ? (new DateTime($student['time_in']))->format('h:i A') : '—';
+
+                          // Format Time-In: show date if not today
+                          $timeInObj = $student['time_in'] ? new DateTime($student['time_in']) : null;
+                          $timeInLabel = '—';
+                          if ($timeInObj) {
+                            $now = new DateTime();
+                            if ($timeInObj->format('Y-m-d') === $now->format('Y-m-d')) {
+                              $timeInLabel = $timeInObj->format('h:i A');
+                            } else {
+                              $timeInLabel = $timeInObj->format('M d, h:i A');
+                            }
+                          }
                         ?>
                           <tr>
                             <td><?php echo htmlspecialchars($fullName); ?></td>
@@ -281,10 +312,78 @@ function getStatusBadgeClass($status)
         }
       };
 
+      const isTimeWithinSchedule = (scheduleStr) => {
+        if (!scheduleStr || scheduleStr === 'Schedule not set') return true; // Allow if no schedule
+
+        try {
+          // Expected format: "Tuesday 05:00 AM - 05:12 AM"
+          const parts = scheduleStr.match(/^(\w+)\s+(\d{1,2}:\d{2}\s*[AP]M)\s*-\s*(\d{1,2}:\d{2}\s*[AP]M)$/i);
+          if (!parts) return true; // Could not parse, allow
+
+          const [_, dayName, startTimeStr, endTimeStr] = parts;
+          const now = new Date();
+
+          // 1. Check Day
+          const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          const currentDay = days[now.getDay()];
+
+          if (currentDay.toLowerCase() !== dayName.toLowerCase()) {
+            return {
+              valid: false,
+              reason: `Today is ${currentDay}, but class is on ${dayName}.`
+            };
+          }
+
+          // 2. Check Time
+          const parseTime = (timeStr) => {
+            const [time, period] = timeStr.split(/\s+/);
+            let [hours, minutes] = time.split(':').map(Number);
+            if (period.toUpperCase() === 'PM' && hours !== 12) hours += 12;
+            if (period.toUpperCase() === 'AM' && hours === 12) hours = 0;
+            return hours * 60 + minutes;
+          };
+
+          const currentMinutes = now.getHours() * 60 + now.getMinutes();
+          const startMinutes = parseTime(startTimeStr);
+          const endMinutes = parseTime(endTimeStr);
+
+          // Allow starting 15 mins early, but strictly enforce end time
+          if (currentMinutes < (startMinutes - 15)) {
+            return {
+              valid: false,
+              reason: `Too early. Class starts at ${startTimeStr}.`
+            };
+          }
+          if (currentMinutes > endMinutes) {
+            return {
+              valid: false,
+              reason: `Class time has ended (${endTimeStr}).`
+            };
+          }
+
+          return {
+            valid: true
+          };
+        } catch (e) {
+          console.error('Schedule validation error:', e);
+          return true; // Fallback allow
+        }
+      };
+
       document.querySelectorAll('.start-session-btn').forEach((button) => {
         button.addEventListener('click', () => {
           const subjectId = button.dataset.subjectId;
+          const schedule = button.dataset.schedule;
+
           if (!subjectId) return;
+
+          // Validate Schedule
+          const validation = isTimeWithinSchedule(schedule);
+          if (validation && validation.valid === false) {
+            Toast.error(`Cannot start session: ${validation.reason}`);
+            return;
+          }
+
           performSessionAction(button, 'start-session', {
             subject_id: subjectId
           }, 'Attendance session started.');

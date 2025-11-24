@@ -3,6 +3,7 @@
  */
 
 const API_BASE = '/cics-attendance-system/backend/api';
+window.API_BASE = API_BASE;
 
 // Toast Notification System
 class Toast {
