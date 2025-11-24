@@ -149,7 +149,138 @@ $activePage = 'subjects';
                         </div>
                         <div class="form-field form-group" style="grid-column: span 2;">
                             <label for="subjectSchedule">Schedule <span class="text-danger">*</span></label>
-                            <textarea id="subjectSchedule" name="schedule" class="form-control" rows="3" placeholder="e.g., Monday, Wednesday, Friday 8:00 AM - 11:00 AM" required></textarea>
+                            <div class="schedule-layout">
+                                <div class="schedule-container">
+                                    <div class="schedule-header-row">
+                                        <span>Day</span>
+                                        <span>Start</span>
+                                        <span>End</span>
+                                    </div>
+                                    <div class="schedule-rows">
+                                        <div class="schedule-row" data-day="Monday">
+                                            <label class="schedule-day">
+                                                <input type="checkbox" class="schedule-day-checkbox" value="Monday">
+                                                <span>Mon</span>
+                                            </label>
+                                            <div class="schedule-time-group">
+                                                <input type="text" class="form-control schedule-start-time" placeholder="00:00" maxlength="5">
+                                                <select class="form-control schedule-start-ampm">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                            <div class="schedule-time-group">
+                                                <input type="text" class="form-control schedule-end-time" placeholder="00:00" maxlength="5">
+                                                <select class="form-control schedule-end-ampm">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="schedule-row" data-day="Tuesday">
+                                            <label class="schedule-day">
+                                                <input type="checkbox" class="schedule-day-checkbox" value="Tuesday">
+                                                <span>Tue</span>
+                                            </label>
+                                            <div class="schedule-time-group">
+                                                <input type="text" class="form-control schedule-start-time" placeholder="00:00" maxlength="5">
+                                                <select class="form-control schedule-start-ampm">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                            <div class="schedule-time-group">
+                                                <input type="text" class="form-control schedule-end-time" placeholder="00:00" maxlength="5">
+                                                <select class="form-control schedule-end-ampm">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="schedule-row" data-day="Wednesday">
+                                            <label class="schedule-day">
+                                                <input type="checkbox" class="schedule-day-checkbox" value="Wednesday">
+                                                <span>Wed</span>
+                                            </label>
+                                            <div class="schedule-time-group">
+                                                <input type="text" class="form-control schedule-start-time" placeholder="00:00" maxlength="5">
+                                                <select class="form-control schedule-start-ampm">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                            <div class="schedule-time-group">
+                                                <input type="text" class="form-control schedule-end-time" placeholder="00:00" maxlength="5">
+                                                <select class="form-control schedule-end-ampm">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="schedule-row" data-day="Thursday">
+                                            <label class="schedule-day">
+                                                <input type="checkbox" class="schedule-day-checkbox" value="Thursday">
+                                                <span>Thu</span>
+                                            </label>
+                                            <div class="schedule-time-group">
+                                                <input type="text" class="form-control schedule-start-time" placeholder="00:00" maxlength="5">
+                                                <select class="form-control schedule-start-ampm">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                            <div class="schedule-time-group">
+                                                <input type="text" class="form-control schedule-end-time" placeholder="00:00" maxlength="5">
+                                                <select class="form-control schedule-end-ampm">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="schedule-row" data-day="Friday">
+                                            <label class="schedule-day">
+                                                <input type="checkbox" class="schedule-day-checkbox" value="Friday">
+                                                <span>Fri</span>
+                                            </label>
+                                            <div class="schedule-time-group">
+                                                <input type="text" class="form-control schedule-start-time" placeholder="00:00" maxlength="5">
+                                                <select class="form-control schedule-start-ampm">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                            <div class="schedule-time-group">
+                                                <input type="text" class="form-control schedule-end-time" placeholder="00:00" maxlength="5">
+                                                <select class="form-control schedule-end-ampm">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="schedule-row" data-day="Saturday">
+                                            <label class="schedule-day">
+                                                <input type="checkbox" class="schedule-day-checkbox" value="Saturday">
+                                                <span>Sat</span>
+                                            </label>
+                                            <div class="schedule-time-group">
+                                                <input type="text" class="form-control schedule-start-time" placeholder="00:00" maxlength="5">
+                                                <select class="form-control schedule-start-ampm">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                            <div class="schedule-time-group">
+                                                <input type="text" class="form-control schedule-end-time" placeholder="00:00" maxlength="5">
+                                                <select class="form-control schedule-end-ampm">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <textarea id="subjectSchedule" name="schedule" class="form-control" rows="2" style="display: none;"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -219,7 +350,91 @@ $activePage = 'subjects';
 
             function init() {
                 attachEvents();
+                initScheduleRowListeners();
                 fetchAllData();
+                
+                // Initialize time inputs after a short delay to ensure DOM is ready
+                setTimeout(initTimeInputs, 100);
+                
+                // Also re-initialize time inputs when the modal is opened
+                document.getElementById('subjectModal').addEventListener('shown.bs.modal', initTimeInputs);
+            }
+
+            function formatTimeInput(input) {
+                // Remove non-numeric characters
+                let value = input.value.replace(/\D/g, '');
+                
+                // Limit to 4 digits
+                if (value.length > 4) {
+                    value = value.substring(0, 4);
+                }
+                
+                // Insert colon after first 2 digits if there are more than 2 digits
+                if (value.length > 2) {
+                    value = value.substring(0, 2) + ':' + value.substring(2);
+                }
+                
+                input.value = value;
+                
+                // Validate hours (00-23) and minutes (00-59)
+                if (value.length === 5) {
+                    const [hours, minutes] = value.split(':');
+                    const hoursNum = parseInt(hours, 10);
+                    const minutesNum = parseInt(minutes, 10);
+                    
+                    if (hoursNum > 23 || minutesNum > 59) {
+                        input.setCustomValidity('Please enter a valid time (00:00 to 23:59)');
+                    } else {
+                        input.setCustomValidity('');
+                    }
+                } else if (value.length > 0) {
+                    input.setCustomValidity('Please enter a valid time (HH:MM)');
+                } else {
+                    input.setCustomValidity('');
+                }
+            }
+            
+            function initTimeInputs() {
+                document.querySelectorAll('.schedule-time-group input[type="text"]').forEach(input => {
+                    // Format on input
+                    input.addEventListener('input', function(e) {
+                        formatTimeInput(this);
+                    });
+                    
+                    // Format on blur to ensure proper format
+                    input.addEventListener('blur', function(e) {
+                        const value = this.value.replace(/\D/g, '');
+                        if (value.length === 3) {
+                            // If user entered 3 digits (e.g., 123), format as 01:23
+                            this.value = '0' + value.substring(0, 1) + ':' + value.substring(1);
+                        } else if (value.length > 0 && value.length < 4) {
+                            // If user entered less than 4 digits, clear the input
+                            this.value = '';
+                            this.setCustomValidity('Please enter a valid time (HH:MM)');
+                        }
+                    });
+                    
+                    // Allow only numbers and backspace
+                    input.addEventListener('keydown', function(e) {
+                        // Allow: backspace, delete, tab, escape, enter
+                        if ([46, 8, 9, 27, 13].includes(e.keyCode) ||
+                            // Allow: Ctrl+A, Command+A
+                            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                            // Allow: Ctrl+C, Command+C
+                            (e.keyCode === 67 && (e.ctrlKey === true || e.metaKey === true)) ||
+                            // Allow: Ctrl+X, Command+X
+                            (e.keyCode === 88 && (e.ctrlKey === true || e.metaKey === true)) ||
+                            // Allow: home, end, left, right, down, up
+                            (e.keyCode >= 35 && e.keyCode <= 40)) {
+                            return;
+                        }
+                        
+                        // Ensure it's a number and stop the keypress if not
+                        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                            e.preventDefault();
+                        }
+                    });
+                });
             }
 
             function attachEvents() {
@@ -228,6 +443,7 @@ $activePage = 'subjects';
                     elements.subjectModalTitle.textContent = 'Add Subject';
                     elements.subjectForm.reset();
                     document.getElementById('subjectInstructor').innerHTML = '<option value="">Select Instructor</option>';
+                    resetScheduleControls();
                     loadInstructors();
                     Modal.open('subjectModal');
                 });
@@ -348,6 +564,143 @@ $activePage = 'subjects';
         `).join('');
             }
 
+            function resetScheduleControls() {
+                const rows = document.querySelectorAll('.schedule-row');
+                // Re-initialize time inputs after reset
+                setTimeout(initTimeInputs, 100);
+                rows.forEach(row => {
+                    const checkbox = row.querySelector('.schedule-day-checkbox');
+                    const startTime = row.querySelector('.schedule-start-time');
+                    const endTime = row.querySelector('.schedule-end-time');
+                    const startAmPm = row.querySelector('.schedule-start-ampm');
+                    const endAmPm = row.querySelector('.schedule-end-ampm');
+
+                    if (checkbox) checkbox.checked = false;
+                    if (startTime) startTime.value = '';
+                    if (endTime) endTime.value = '';
+                    if (startAmPm) startAmPm.value = 'AM';
+                    if (endAmPm) endAmPm.value = 'AM';
+                });
+
+                const hiddenSchedule = document.getElementById('subjectSchedule');
+                if (hiddenSchedule) hiddenSchedule.value = '';
+
+                updateScheduleRowStates();
+            }
+
+            function updateScheduleRowStates() {
+                const rows = document.querySelectorAll('.schedule-row');
+                rows.forEach(row => {
+                    const checkbox = row.querySelector('.schedule-day-checkbox');
+                    const isActive = checkbox && checkbox.checked;
+                    row.classList.toggle('is-active', !!isActive);
+                });
+            }
+
+            function initScheduleRowListeners() {
+                const rows = document.querySelectorAll('.schedule-row');
+                rows.forEach(row => {
+                    const checkbox = row.querySelector('.schedule-day-checkbox');
+                    if (!checkbox) return;
+
+                    checkbox.addEventListener('change', () => {
+                        if (!checkbox.checked) {
+                            const startTime = row.querySelector('.schedule-start-time');
+                            const endTime = row.querySelector('.schedule-end-time');
+                            const startAmPm = row.querySelector('.schedule-start-ampm');
+                            const endAmPm = row.querySelector('.schedule-end-ampm');
+
+                            if (startTime) startTime.value = '';
+                            if (endTime) endTime.value = '';
+                            if (startAmPm) startAmPm.value = 'AM';
+                            if (endAmPm) endAmPm.value = 'AM';
+                        }
+
+                        updateScheduleRowStates();
+                    });
+                });
+
+                updateScheduleRowStates();
+            }
+
+            function buildScheduleFromControls() {
+                const rows = document.querySelectorAll('.schedule-row');
+                const parts = [];
+                const timeRegex = /^\d{1,2}:\d{2}$/;
+
+                rows.forEach(row => {
+                    const checkbox = row.querySelector('.schedule-day-checkbox');
+                    if (!checkbox || !checkbox.checked) return;
+
+                    const day = row.getAttribute('data-day') || checkbox.value;
+                    const startTime = (row.querySelector('.schedule-start-time')?.value || '').trim();
+                    const endTime = (row.querySelector('.schedule-end-time')?.value || '').trim();
+                    const startAmPm = row.querySelector('.schedule-start-ampm')?.value || 'AM';
+                    const endAmPm = row.querySelector('.schedule-end-ampm')?.value || 'AM';
+
+                    if (!startTime || !endTime) {
+                        return;
+                    }
+
+                    if (!timeRegex.test(startTime) || !timeRegex.test(endTime)) {
+                        return;
+                    }
+
+                    parts.push(`${day} ${startTime} ${startAmPm} - ${endTime} ${endAmPm}`);
+                });
+
+                if (!parts.length) {
+                    return '';
+                }
+
+                return parts.join('; ');
+            }
+
+            function populateScheduleControlsFromString(scheduleStr) {
+                resetScheduleControls();
+                if (!scheduleStr) return;
+
+                const rows = document.querySelectorAll('.schedule-row');
+                const rowMap = {};
+                rows.forEach(row => {
+                    const day = row.getAttribute('data-day');
+                    if (day) rowMap[day.toLowerCase()] = row;
+                });
+
+                const entries = scheduleStr.split(';');
+                const pattern = /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)\s+(\d{1,2}:\d{2})\s*(AM|PM)\s*-\s*(\d{1,2}:\d{2})\s*(AM|PM)$/i;
+
+                entries.forEach(raw => {
+                    const part = raw.trim();
+                    if (!part) return;
+                    const match = part.match(pattern);
+                    if (!match) return;
+
+                    const day = match[1];
+                    const startTime = match[2];
+                    const startAmPm = match[3].toUpperCase();
+                    const endTime = match[4];
+                    const endAmPm = match[5].toUpperCase();
+
+                    const row = rowMap[day.toLowerCase()];
+                    if (!row) return;
+
+                    const checkbox = row.querySelector('.schedule-day-checkbox');
+                    const startInput = row.querySelector('.schedule-start-time');
+                    const endInput = row.querySelector('.schedule-end-time');
+                    const startSelect = row.querySelector('.schedule-start-ampm');
+                    const endSelect = row.querySelector('.schedule-end-ampm');
+
+                    if (checkbox) checkbox.checked = true;
+                    if (startInput) startInput.value = startTime;
+                    if (endInput) endInput.value = endTime;
+                    if (startSelect) startSelect.value = startAmPm;
+                    if (endSelect) endSelect.value = endAmPm;
+                });
+
+                updateScheduleRowStates();
+            }
+
             window.handleEditSubject = async function(subjectId) {
                 try {
                     const response = await fetch(`${API_BASE}/admin/subjects/${subjectId}`, {
@@ -368,8 +721,8 @@ $activePage = 'subjects';
                     document.getElementById('subjectYearLevel').value = subject.year_level || '';
                     document.getElementById('subjectSection').value = subject.section || '';
                     document.getElementById('subjectRoom').value = subject.room || '';
-                    // Handle schedule - now plain text
                     document.getElementById('subjectSchedule').value = subject.schedule || '';
+                    populateScheduleControlsFromString(subject.schedule || '');
 
                     loadInstructors();
                     setTimeout(() => {
@@ -391,17 +744,18 @@ $activePage = 'subjects';
 
             async function handleSaveSubject(event) {
                 event.preventDefault();
+
+                const scheduleString = buildScheduleFromControls();
+                if (!scheduleString) {
+                    Toast.error('Please select at least one day and provide valid times (HH:MM).');
+                    return;
+                }
+
+                document.getElementById('subjectSchedule').value = scheduleString;
+
                 if (!FormValidator.validate(elements.subjectForm)) return;
 
                 const formData = new FormData(elements.subjectForm);
-
-                // Get schedule as plain text (required)
-                const schedule = formData.get('schedule')?.trim();
-                if (!schedule) {
-                    Toast.error('Schedule is required.');
-                    setSavingState(false);
-                    return;
-                }
 
                 const payload = {
                     code: formData.get('code')?.trim(),
@@ -411,7 +765,7 @@ $activePage = 'subjects';
                     year_level: parseInt(formData.get('year_level')),
                     section: formData.get('section')?.trim(),
                     room: formData.get('room')?.trim() || null,
-                    schedule: schedule
+                    schedule: scheduleString
                 };
 
                 setSavingState(true);
