@@ -388,6 +388,66 @@ if ($userData) {
         grid.appendChild(dayElement);
       });
     }
+    
+    // Function to load today's schedule
+    async function loadTodaysSchedule() {
+      const scheduleList = document.getElementById('scheduleList');
+      
+      try {
+        // First, get today's day name (e.g., 'Monday', 'Tuesday')
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const today = new Date();
+        const todayName = days[today.getDay()];
+        
+        // Get the weekly schedule
+        const response = await fetch('/cics-attendance-system/backend/api/student/schedule', {
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          const json = await response.json();
+          if (json.success && json.data) {
+            const todaySchedule = json.data[todayName] || [];
+            
+            if (todaySchedule.length > 0) {
+              let html = '';
+              todaySchedule.forEach(cls => {
+                html += `
+                  <div class="schedule-item">
+                    <div class="schedule-time">
+                      ${formatTimeTo12Hour(cls.start_time)} - ${formatTimeTo12Hour(cls.end_time)}
+                    </div>
+                    <div class="schedule-details">
+                      <div class="schedule-subject">${cls.subject_name || 'No Subject'}</div>
+                      <div class="schedule-meta">
+                        <span class="schedule-room">${cls.room || 'TBA'}</span>
+                        <span class="schedule-instructor">${cls.instructor || 'TBA'}</span>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              });
+              scheduleList.innerHTML = html;
+            } else {
+              scheduleList.innerHTML = `
+                <div class="schedule-item" style="text-align: center; padding: var(--spacing-md); color: var(--text-secondary);">
+                  No classes scheduled for today
+                </div>
+              `;
+            }
+          }
+        } else {
+          throw new Error('Failed to fetch schedule');
+        }
+      } catch (error) {
+        console.error('Error loading today\'s schedule:', error);
+        scheduleList.innerHTML = `
+          <div class="schedule-item" style="text-align: center; padding: var(--spacing-md); color: var(--error-color);">
+            Failed to load today's schedule. Please try again later.
+          </div>
+        `;
+      }
+    }
 
     // Handle attendance button
     document.getElementById('attendanceBtn').addEventListener('click', async function() {
