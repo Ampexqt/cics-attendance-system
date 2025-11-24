@@ -113,10 +113,8 @@ $activePage = 'subjects';
                             <label for="subjectProgram">Program <span class="text-danger">*</span></label>
                             <select id="subjectProgram" name="program" class="form-control" required>
                                 <option value="">Select Program</option>
-                                <option value="BSCS">BSCS</option>
                                 <option value="BSIT">BSIT</option>
                                 <option value="BSIS">BSIS</option>
-                                <option value="BSCE">BSCE</option>
                             </select>
                         </div>
                         <div class="form-field form-group">
@@ -352,10 +350,10 @@ $activePage = 'subjects';
                 attachEvents();
                 initScheduleRowListeners();
                 fetchAllData();
-                
+
                 // Initialize time inputs after a short delay to ensure DOM is ready
                 setTimeout(initTimeInputs, 100);
-                
+
                 // Also re-initialize time inputs when the modal is opened
                 document.getElementById('subjectModal').addEventListener('shown.bs.modal', initTimeInputs);
             }
@@ -363,25 +361,25 @@ $activePage = 'subjects';
             function formatTimeInput(input) {
                 // Remove non-numeric characters
                 let value = input.value.replace(/\D/g, '');
-                
+
                 // Limit to 4 digits
                 if (value.length > 4) {
                     value = value.substring(0, 4);
                 }
-                
+
                 // Insert colon after first 2 digits if there are more than 2 digits
                 if (value.length > 2) {
                     value = value.substring(0, 2) + ':' + value.substring(2);
                 }
-                
+
                 input.value = value;
-                
+
                 // Validate hours (00-23) and minutes (00-59)
                 if (value.length === 5) {
                     const [hours, minutes] = value.split(':');
                     const hoursNum = parseInt(hours, 10);
                     const minutesNum = parseInt(minutes, 10);
-                    
+
                     if (hoursNum > 23 || minutesNum > 59) {
                         input.setCustomValidity('Please enter a valid time (00:00 to 23:59)');
                     } else {
@@ -393,14 +391,14 @@ $activePage = 'subjects';
                     input.setCustomValidity('');
                 }
             }
-            
+
             function initTimeInputs() {
                 document.querySelectorAll('.schedule-time-group input[type="text"]').forEach(input => {
                     // Format on input
                     input.addEventListener('input', function(e) {
                         formatTimeInput(this);
                     });
-                    
+
                     // Format on blur to ensure proper format
                     input.addEventListener('blur', function(e) {
                         const value = this.value.replace(/\D/g, '');
@@ -413,7 +411,7 @@ $activePage = 'subjects';
                             this.setCustomValidity('Please enter a valid time (HH:MM)');
                         }
                     });
-                    
+
                     // Allow only numbers and backspace
                     input.addEventListener('keydown', function(e) {
                         // Allow: backspace, delete, tab, escape, enter
@@ -428,7 +426,7 @@ $activePage = 'subjects';
                             (e.keyCode >= 35 && e.keyCode <= 40)) {
                             return;
                         }
-                        
+
                         // Ensure it's a number and stop the keypress if not
                         if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
                             e.preventDefault();

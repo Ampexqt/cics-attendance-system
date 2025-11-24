@@ -467,9 +467,25 @@ if ($userData) {
 
         if (response.ok && result.success && result.data) {
           studentActiveSession = result.data;
-          button.disabled = false;
           const subject = result.data.subject || {};
           const windowLabel = result.data.window?.label || 'Session in progress';
+          const status = result.data.attendance_status; // 'none', 'timed_in', 'timed_out'
+
+          // Update Button State based on Attendance Status
+          button.disabled = false;
+          button.classList.remove('btn-danger', 'btn-success', 'btn-secondary');
+
+          if (status === 'timed_out') {
+            button.innerText = 'Completed';
+            button.disabled = true;
+            button.classList.add('btn-secondary');
+          } else if (status === 'timed_in') {
+            button.innerText = 'Time-Out';
+            button.classList.add('btn-danger'); // Make it red for Time-Out
+          } else {
+            button.innerText = 'Time-In';
+            button.classList.add('btn-success'); // Green for Time-In
+          }
 
           statusContainer.innerHTML = `
             <div class="status-item success">
@@ -488,6 +504,7 @@ if ($userData) {
         } else {
           studentActiveSession = null;
           button.disabled = true;
+          button.innerText = 'No Active Session';
           statusContainer.innerHTML = `
             <div class="status-item info">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -512,7 +529,7 @@ if ($userData) {
           <div class="status-item warning">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12z" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75-9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12z" />
             </svg>
             <span>Unable to load active session. Please refresh.</span>
           </div>
@@ -527,7 +544,16 @@ if ($userData) {
         return;
       }
 
-      Toast.info('Processing attendance...', 'Please wait');
+      const currentStatus = studentActiveSession.attendance_status;
+      if (currentStatus === 'timed_out') {
+        Toast.info('You have already completed attendance for this session.', 'Completed');
+        return;
+      }
+
+      const isTimeOut = currentStatus === 'timed_in';
+      const actionText = isTimeOut ? 'Time-Out' : 'Time-In';
+
+      Toast.info(`Processing ${actionText}...`, 'Please wait');
 
       try {
         if (!navigator.geolocation) {
@@ -548,9 +574,10 @@ if ($userData) {
         const startTime = Date.now();
 
         // Show loading state
-        const originalBtnText = document.getElementById('attendanceBtn').innerText;
-        document.getElementById('attendanceBtn').disabled = true;
-        document.getElementById('attendanceBtn').innerHTML = '<span class="spinner" style="width: 16px; height: 16px; display:inline-block;"></span> Getting location...';
+        const button = document.getElementById('attendanceBtn');
+        const originalBtnText = button.innerText;
+        button.disabled = true;
+        button.innerHTML = `<span class="spinner" style="width: 16px; height: 16px; display:inline-block;"></span> ${actionText}...`;
 
         // Set timeout to stop watching after maxWaitTime
         let timeoutId = setTimeout(() => {
@@ -573,7 +600,7 @@ if ($userData) {
               // Restart strategy
               if (!restartAttempted && elapsed > 3000 && bestPosition && bestPosition.coords.accuracy > 1000) {
                 restartAttempted = true;
-                document.getElementById('attendanceBtn').innerHTML = '<span class="spinner" style="width: 16px; height: 16px; display:inline-block;"></span> Retrying GPS...';
+                button.innerHTML = `<span class="spinner" style="width: 16px; height: 16px; display:inline-block;"></span> Retrying GPS...`;
                 startWatch();
                 return;
               }
@@ -604,8 +631,8 @@ if ($userData) {
         function finish(position) {
           clearTimeout(timeoutId);
           if (watchId) navigator.geolocation.clearWatch(watchId);
-          document.getElementById('attendanceBtn').disabled = false;
-          document.getElementById('attendanceBtn').innerText = originalBtnText;
+          button.disabled = false;
+          button.innerText = originalBtnText;
 
           if (position) {
             submitAttendance(position);
@@ -615,8 +642,8 @@ if ($userData) {
         }
 
         function handleGeoError(error) {
-          document.getElementById('attendanceBtn').disabled = false;
-          document.getElementById('attendanceBtn').innerText = originalBtnText;
+          button.disabled = false;
+          button.innerText = originalBtnText;
 
           if (error.code === error.PERMISSION_DENIED) {
             Toast.error('Location permission denied.', 'Error');
@@ -629,8 +656,10 @@ if ($userData) {
         startWatch();
 
         async function submitAttendance(position) {
+          const endpoint = isTimeOut ? 'timeout' : 'mark';
+
           try {
-            const response = await fetch('/cics-attendance-system/backend/api/attendance/mark', {
+            const response = await fetch(`/cics-attendance-system/backend/api/attendance/${endpoint}`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -640,21 +669,21 @@ if ($userData) {
                 session_id: studentActiveSession.session.id,
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude,
-                accuracy: position.coords.accuracy // Send accuracy for logging/verification
+                accuracy: position.coords.accuracy
               })
             });
 
             const data = await response.json();
 
             if (data.success) {
-              Toast.success('Attendance marked successfully!', 'Success');
+              Toast.success(`${actionText} successful!`, 'Success');
               loadDashboardData();
               loadActiveSessionState();
             } else {
-              Toast.error(data.message || 'Failed to mark attendance', 'Error');
+              Toast.error(data.message || `Failed to ${actionText}`, 'Error');
             }
           } catch (error) {
-            Toast.error('Failed to mark attendance. Please try again.', 'Error');
+            Toast.error(`Failed to ${actionText}. Please try again.`, 'Error');
           }
         }
       } catch (error) {

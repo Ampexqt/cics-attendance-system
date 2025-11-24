@@ -187,122 +187,134 @@ class AttendanceController
 
     public function startSession()
     {
-        Auth::requireRole('instructor');
+        try {
+            Auth::requireRole('instructor');
 
-        $data = json_decode(file_get_contents('php://input'), true) ?? [];
+            $data = json_decode(file_get_contents('php://input'), true) ?? [];
 
-        $errors = Validator::validate($data, [
-            'subject_id' => 'required|numeric'
-        ]);
+            $errors = Validator::validate($data, [
+                'subject_id' => 'required|numeric'
+            ]);
 
-        if (!empty($errors)) {
-            Response::validationError($errors);
+            if (!empty($errors)) {
+                Response::validationError($errors);
+            }
+
+            $userId = Auth::userId();
+            $instructor = $this->instructorModel->findByUserId($userId);
+
+            if (!$instructor) {
+                Response::error('Instructor record not found', null, 404);
+            }
+
+            $subject = $this->subjectModel->findById($data['subject_id']);
+
+            if (!$subject) {
+                Response::notFound('Subject not found');
+            }
+
+            if ((int)$subject['instructor_id'] !== (int)$instructor['id']) {
+                Response::forbidden('You are not assigned to this subject');
+            }
+
+            $existingSession = $this->attendanceModel->getActiveSession($subject['id']);
+            if ($existingSession) {
+                Response::error('An active session already exists for this subject', null, 409);
+            }
+
+            if (empty($subject['schedule'])) {
+                Response::error('This subject does not have a configured schedule', null, 422);
+            }
+
+            $config = require __DIR__ . '/../config/app.php';
+            $graceBefore = $config['attendance']['session_grace_before'] ?? 0;
+            $graceAfter = $config['attendance']['session_grace_after'] ?? 0;
+
+            $now = Helper::now();
+            $sessionDate = date('Y-m-d', strtotime($now));
+            $sessionTime = date('H:i:s', strtotime($now));
+            $todayWindow = Helper::getScheduleWindowForDate($subject['schedule'], $sessionDate);
+
+            if (!$todayWindow) {
+                Response::error('This subject is not scheduled for today', null, 422);
+            }
+
+            if (!Helper::isWithinScheduleWindow($subject['schedule'], $now, $graceBefore, $graceAfter)) {
+                $windowLabel = sprintf(
+                    '%s - %s',
+                    date('h:i A', strtotime($todayWindow['start_time'])),
+                    date('h:i A', strtotime($todayWindow['end_time']))
+                );
+                Response::error(
+                    "You can only start this session during the scheduled window ({$windowLabel}).",
+                    null,
+                    422
+                );
+            }
+
+            $sessionId = $this->attendanceModel->createSession([
+                'subject_id' => $subject['id'],
+                'instructor_id' => $instructor['id'],
+                'session_date' => $sessionDate,
+                'start_time' => $sessionTime,
+                'gps_latitude' => $data['gps_latitude'] ?? null,
+                'gps_longitude' => $data['gps_longitude'] ?? null
+            ]);
+
+            $session = $this->attendanceModel->getSessionById($sessionId);
+
+            Response::success('Attendance session started successfully', $session);
+        } catch (\Throwable $e) {
+            error_log("startSession Error: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
+            Response::error('Server Error: ' . $e->getMessage(), null, 500);
         }
-
-        $userId = Auth::userId();
-        $instructor = $this->instructorModel->findByUserId($userId);
-
-        if (!$instructor) {
-            Response::error('Instructor record not found', null, 404);
-        }
-
-        $subject = $this->subjectModel->findById($data['subject_id']);
-
-        if (!$subject) {
-            Response::notFound('Subject not found');
-        }
-
-        if ((int)$subject['instructor_id'] !== (int)$instructor['id']) {
-            Response::forbidden('You are not assigned to this subject');
-        }
-
-        $existingSession = $this->attendanceModel->getActiveSession($subject['id']);
-        if ($existingSession) {
-            Response::error('An active session already exists for this subject', null, 409);
-        }
-
-        if (empty($subject['schedule'])) {
-            Response::error('This subject does not have a configured schedule', null, 422);
-        }
-
-        $config = require __DIR__ . '/../config/app.php';
-        $graceBefore = $config['attendance']['session_grace_before'] ?? 0;
-        $graceAfter = $config['attendance']['session_grace_after'] ?? 0;
-
-        $now = Helper::now();
-        $sessionDate = date('Y-m-d', strtotime($now));
-        $sessionTime = date('H:i:s', strtotime($now));
-        $todayWindow = Helper::getScheduleWindowForDate($subject['schedule'], $sessionDate);
-
-        if (!$todayWindow) {
-            Response::error('This subject is not scheduled for today', null, 422);
-        }
-
-        if (!Helper::isWithinScheduleWindow($subject['schedule'], $now, $graceBefore, $graceAfter)) {
-            $windowLabel = sprintf(
-                '%s - %s',
-                date('h:i A', strtotime($todayWindow['start_time'])),
-                date('h:i A', strtotime($todayWindow['end_time']))
-            );
-            Response::error(
-                "You can only start this session during the scheduled window ({$windowLabel}).",
-                null,
-                422
-            );
-        }
-
-        $sessionId = $this->attendanceModel->createSession([
-            'subject_id' => $subject['id'],
-            'instructor_id' => $instructor['id'],
-            'session_date' => $sessionDate,
-            'start_time' => $sessionTime,
-            'gps_latitude' => $data['gps_latitude'] ?? null,
-            'gps_longitude' => $data['gps_longitude'] ?? null
-        ]);
-
-        $session = $this->attendanceModel->getSessionById($sessionId);
-
-        Response::success('Attendance session started successfully', $session);
     }
 
     public function endSession()
     {
-        Auth::requireRole('instructor');
+        try {
+            Auth::requireRole('instructor');
 
-        $data = json_decode(file_get_contents('php://input'), true) ?? [];
+            $data = json_decode(file_get_contents('php://input'), true) ?? [];
 
-        $errors = Validator::validate($data, [
-            'session_id' => 'required|numeric'
-        ]);
+            $errors = Validator::validate($data, [
+                'session_id' => 'required|numeric'
+            ]);
 
-        if (!empty($errors)) {
-            Response::validationError($errors);
+            if (!empty($errors)) {
+                Response::validationError($errors);
+            }
+
+            $userId = Auth::userId();
+            $instructor = $this->instructorModel->findByUserId($userId);
+
+            if (!$instructor) {
+                Response::error('Instructor record not found', null, 404);
+            }
+
+            $session = $this->attendanceModel->getSessionById($data['session_id']);
+
+            if (!$session) {
+                Response::notFound('Attendance session not found');
+            }
+
+            if ((int)$session['instructor_id'] !== (int)$instructor['id']) {
+                Response::forbidden('You are not authorized to end this session');
+            }
+
+            if ($session['status'] !== 'active') {
+                Response::error('Attendance session is already ended', null, 409);
+            }
+
+            $this->attendanceModel->endSession($session['id']);
+
+            Response::success('Attendance session ended successfully');
+        } catch (\Throwable $e) {
+            error_log("endSession Error: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
+            Response::error('Server Error: ' . $e->getMessage(), null, 500);
         }
-
-        $userId = Auth::userId();
-        $instructor = $this->instructorModel->findByUserId($userId);
-
-        if (!$instructor) {
-            Response::error('Instructor record not found', null, 404);
-        }
-
-        $session = $this->attendanceModel->getSessionById($data['session_id']);
-
-        if (!$session) {
-            Response::notFound('Attendance session not found');
-        }
-
-        if ((int)$session['instructor_id'] !== (int)$instructor['id']) {
-            Response::forbidden('You are not authorized to end this session');
-        }
-
-        if ($session['status'] !== 'active') {
-            Response::error('Attendance session is already ended', null, 409);
-        }
-
-        $this->attendanceModel->endSession($session['id']);
-
-        Response::success('Attendance session ended successfully');
     }
 
     public function getStudentActiveSession()
@@ -357,6 +369,22 @@ class AttendanceController
                 date('h:i A', strtotime($sessionEndTime))
             );
 
+            // Check for existing attendance record
+            $attendanceRecord = $this->attendanceModel->getRecords([
+                'student_id' => $userId,
+                'session_id' => $session['id']
+            ]);
+
+            $attendanceStatus = 'none';
+            if (!empty($attendanceRecord)) {
+                $record = $attendanceRecord[0];
+                if (!empty($record['time_out'])) {
+                    $attendanceStatus = 'timed_out';
+                } else {
+                    $attendanceStatus = 'timed_in';
+                }
+            }
+
             Response::success('Active session retrieved', [
                 'session' => [
                     'id' => (int) $session['id'],
@@ -379,7 +407,8 @@ class AttendanceController
                     'start_time' => $sessionStartTime,
                     'end_time' => $sessionEndTime,
                     'label' => $windowLabel
-                ]
+                ],
+                'attendance_status' => $attendanceStatus
             ]);
         } catch (\Throwable $e) {
             error_log("getStudentActiveSession Error: " . $e->getMessage());
