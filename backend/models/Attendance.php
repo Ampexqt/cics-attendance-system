@@ -150,6 +150,84 @@ class Attendance {
         return $this->db->fetchAll($sql, $params);
     }
     
+    /**
+     * Get active sessions for an instructor
+     * 
+     * @param int $instructorId The ID of the instructor
+     * @return array List of active sessions with subject details
+     */
+    public function getActiveSessions($instructorId) {
+        $sql = "SELECT 
+                    ases.*,
+                    s.code as subject_code,
+                    s.name as subject_name,
+                    s.section,
+                    s.room,
+                    s.program,
+                    s.year_level
+                FROM attendance_sessions ases
+                JOIN subjects s ON ases.subject_id = s.id
+                WHERE ases.instructor_id = :instructor_id 
+                AND ases.status = 'active'
+                AND ases.session_date = CURDATE()
+                ORDER BY ases.start_time ASC";
+        
+        return $this->db->fetchAll($sql, [':instructor_id' => $instructorId]);
+    }
+
+    /**
+     * Get all student attendance records for a session.
+     *
+     * @param int $sessionId
+     * @return array
+     */
+    public function getSessionStudents($sessionId) {
+        $sql = "SELECT 
+                    ar.*,
+                    s.student_id as student_number,
+                    s.first_name,
+                    s.last_name,
+                    s.program,
+                    s.year_level,
+                    s.section
+                FROM attendance_records ar
+                JOIN students s ON ar.student_id = s.id
+                WHERE ar.session_id = :session_id
+                ORDER BY s.last_name ASC, s.first_name ASC";
+
+        return $this->db->fetchAll($sql, [':session_id' => $sessionId]);
+    }
+    
+    /**
+     * Get correction requests for an instructor's students
+     * 
+     * @param int $instructorId The ID of the instructor
+     * @return array List of correction requests with student and subject details
+     */
+    public function getInstructorCorrectionRequests($instructorId) {
+        $sql = "SELECT 
+                    cr.*,
+                    s.first_name, 
+                    s.last_name,
+                    s.student_id as student_number,
+                    sub.code as subject_code,
+                    sub.name as subject_name,
+                    ar.session_id,
+                    ar.time_in,
+                    ar.status as current_status,
+                    ases.session_date
+                FROM correction_requests cr
+                JOIN attendance_records ar ON cr.attendance_id = ar.id
+                JOIN attendance_sessions ases ON ar.session_id = ases.id
+                JOIN subjects sub ON ases.subject_id = sub.id
+                JOIN students s ON cr.student_id = s.id
+                WHERE sub.instructor_id = :instructor_id
+                AND cr.status = 'pending'
+                ORDER BY cr.created_at DESC";
+        
+        return $this->db->fetchAll($sql, [':instructor_id' => $instructorId]);
+    }
+    
     public function getSummary($filters = []) {
         $sql = "SELECT 
                     COUNT(DISTINCT ar.id) as total_records,

@@ -6,6 +6,8 @@
 
 require_once __DIR__ . '/../models/Attendance.php';
 require_once __DIR__ . '/../models/Student.php';
+require_once __DIR__ . '/../models/Instructor.php';
+require_once __DIR__ . '/../models/Subject.php';
 require_once __DIR__ . '/../middleware/Auth.php';
 require_once __DIR__ . '/../utils/Response.php';
 require_once __DIR__ . '/../utils/Validator.php';
@@ -14,10 +16,14 @@ require_once __DIR__ . '/../utils/Helper.php';
 class AttendanceController {
     private $attendanceModel;
     private $studentModel;
+    private $instructorModel;
+    private $subjectModel;
     
     public function __construct() {
         $this->attendanceModel = new Attendance();
         $this->studentModel = new Student();
+        $this->instructorModel = new Instructor();
+        $this->subjectModel = new Subject();
     }
     
     public function markAttendance() {
@@ -146,6 +152,98 @@ class AttendanceController {
         // Admin/Instructor can see overall summary
         $summary = $this->attendanceModel->getSummary($filters);
         Response::success('Attendance summary retrieved', $summary);
+    }
+
+    public function startSession() {
+        Auth::requireRole('instructor');
+
+        $data = json_decode(file_get_contents('php://input'), true) ?? [];
+
+        $errors = Validator::validate($data, [
+            'subject_id' => 'required|numeric'
+        ]);
+
+        if (!empty($errors)) {
+            Response::validationError($errors);
+        }
+
+        $userId = Auth::userId();
+        $instructor = $this->instructorModel->findByUserId($userId);
+
+        if (!$instructor) {
+            Response::error('Instructor record not found', null, 404);
+        }
+
+        $subject = $this->subjectModel->findById($data['subject_id']);
+
+        if (!$subject) {
+            Response::notFound('Subject not found');
+        }
+
+        if ((int)$subject['instructor_id'] !== (int)$instructor['id']) {
+            Response::forbidden('You are not assigned to this subject');
+        }
+
+        $existingSession = $this->attendanceModel->getActiveSession($subject['id']);
+        if ($existingSession) {
+            Response::error('An active session already exists for this subject', null, 409);
+        }
+
+        $now = Helper::now();
+        $sessionDate = date('Y-m-d', strtotime($now));
+        $sessionTime = date('H:i:s', strtotime($now));
+
+        $sessionId = $this->attendanceModel->createSession([
+            'subject_id' => $subject['id'],
+            'instructor_id' => $instructor['id'],
+            'session_date' => $sessionDate,
+            'start_time' => $sessionTime,
+            'gps_latitude' => $data['gps_latitude'] ?? null,
+            'gps_longitude' => $data['gps_longitude'] ?? null
+        ]);
+
+        $session = $this->attendanceModel->getSessionById($sessionId);
+
+        Response::success('Attendance session started successfully', $session);
+    }
+
+    public function endSession() {
+        Auth::requireRole('instructor');
+
+        $data = json_decode(file_get_contents('php://input'), true) ?? [];
+
+        $errors = Validator::validate($data, [
+            'session_id' => 'required|numeric'
+        ]);
+
+        if (!empty($errors)) {
+            Response::validationError($errors);
+        }
+
+        $userId = Auth::userId();
+        $instructor = $this->instructorModel->findByUserId($userId);
+
+        if (!$instructor) {
+            Response::error('Instructor record not found', null, 404);
+        }
+
+        $session = $this->attendanceModel->getSessionById($data['session_id']);
+
+        if (!$session) {
+            Response::notFound('Attendance session not found');
+        }
+
+        if ((int)$session['instructor_id'] !== (int)$instructor['id']) {
+            Response::forbidden('You are not authorized to end this session');
+        }
+
+        if ($session['status'] !== 'active') {
+            Response::error('Attendance session is already ended', null, 409);
+        }
+
+        $this->attendanceModel->endSession($session['id']);
+
+        Response::success('Attendance session ended successfully');
     }
 }
 

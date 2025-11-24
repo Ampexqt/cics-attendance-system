@@ -124,6 +124,22 @@ try {
                     }
                     break;
 
+                case 'start-session':
+                    if ($method === 'POST') {
+                        $attendanceController->startSession();
+                    } else {
+                        Response::error('Method not allowed', null, 405);
+                    }
+                    break;
+
+                case 'end-session':
+                    if ($method === 'POST') {
+                        $attendanceController->endSession();
+                    } else {
+                        Response::error('Method not allowed', null, 405);
+                    }
+                    break;
+
                 default:
                     Response::notFound('Attendance endpoint not found');
             }
