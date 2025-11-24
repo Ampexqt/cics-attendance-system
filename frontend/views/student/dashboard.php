@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Student Dashboard
  * CICS Attendance System
@@ -16,10 +17,10 @@ $program = '';
 $section = '';
 
 if ($userData) {
-    $studentName = ($userData['first_name'] ?? '') . ' ' . ($userData['last_name'] ?? '');
-    $studentId = $userData['student_id'] ?? '';
-    $program = $userData['program'] ?? '';
-    $section = $userData['section'] ?? '';
+  $studentName = ($userData['first_name'] ?? '') . ' ' . ($userData['last_name'] ?? '');
+  $studentId = $userData['student_id'] ?? '';
+  $program = $userData['program'] ?? '';
+  $section = $userData['section'] ?? '';
 }
 ?>
 <!DOCTYPE html>
@@ -42,6 +43,7 @@ if ($userData) {
   <link rel="stylesheet" href="../../assets/css/components/forms.css">
   <!-- Page Styles -->
   <link rel="stylesheet" href="../../assets/css/pages/dashboard.css">
+  <link rel="stylesheet" href="../../assets/css/pages/student-schedule.css">
   <!-- Main Styles -->
   <link rel="stylesheet" href="../../assets/css/main.css">
 </head>
@@ -203,6 +205,25 @@ if ($userData) {
               </div>
             </div>
           </div>
+
+          <!-- Class Schedule Card -->
+          <div class="card schedule-card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.25rem; height: 1.25rem; display: inline-block; margin-right: var(--spacing-sm);">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-16.5 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-16.5 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                </svg>
+                Weekly Class Schedule
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="schedule-grid" id="weeklyScheduleGrid">
+                <div style="text-align: center; padding: var(--spacing-md); color: var(--text-secondary); grid-column: 1 / -1;">
+                  Loading schedule...
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>
@@ -251,7 +272,7 @@ if ($userData) {
         const summaryResponse = await fetch('/cics-attendance-system/backend/api/attendance/summary', {
           credentials: 'include'
         });
-        
+
         if (summaryResponse.ok) {
           const summaryData = await summaryResponse.json();
           if (summaryData.success && summaryData.data) {
@@ -260,7 +281,7 @@ if ($userData) {
             const present = stats.present || 0;
             const absent = stats.absent || 0;
             const late = stats.late || 0;
-            
+
             // Calculate percentage
             const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
             document.getElementById('summaryPercentage').textContent = percentage + '%';
@@ -284,10 +305,85 @@ if ($userData) {
       }
     }
 
+    // Load weekly schedule
+    async function loadWeeklySchedule() {
+      try {
+        const response = await fetch('/cics-attendance-system/backend/api/student/schedule', {
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          const json = await response.json();
+          if (json.success && json.data) {
+            renderSchedule(json.data);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading schedule:', error);
+        document.getElementById('weeklyScheduleGrid').innerHTML = `
+          <div style="text-align: center; padding: var(--spacing-md); color: var(--error-color); grid-column: 1 / -1;">
+            Failed to load schedule.
+          </div>
+        `;
+      }
+    }
+
+    function renderSchedule(scheduleData) {
+      const grid = document.getElementById('weeklyScheduleGrid');
+      grid.innerHTML = '';
+
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+      days.forEach(day => {
+        const daySchedule = scheduleData[day] || [];
+        const dayElement = document.createElement('div');
+        dayElement.className = 'schedule-day';
+
+        let classesHtml = '';
+
+        if (daySchedule.length > 0) {
+          daySchedule.forEach(cls => {
+            classesHtml += `
+              <div class="class-item">
+                <span class="class-time">${cls.start_time} - ${cls.end_time}</span>
+                <div class="class-subject">${cls.subject_name}</div>
+                <div class="class-details">
+                  <div class="class-detail-row">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="class-detail-icon">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 6.627-5.373 12-12 12s-12-5.373-12-12 5.373-12 12-12 12 5.373 12 12z" />
+                    </svg>
+                    <span>${cls.room || 'TBA'}</span>
+                  </div>
+                  <div class="class-detail-row">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="class-detail-icon">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
+                    <span>${cls.instructor || 'TBA'}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+        } else {
+          classesHtml = '<div class="empty-day">No classes</div>';
+        }
+
+        dayElement.innerHTML = `
+          <div class="schedule-day-header">${day}</div>
+          <div class="schedule-day-body">
+            ${classesHtml}
+          </div>
+        `;
+
+        grid.appendChild(dayElement);
+      });
+    }
+
     // Handle attendance button
     document.getElementById('attendanceBtn').addEventListener('click', async function() {
       Toast.info('Processing attendance...', 'Please wait');
-      
+
       try {
         // Get GPS location
         if (!navigator.geolocation) {
@@ -311,7 +407,7 @@ if ($userData) {
             });
 
             const data = await response.json();
-            
+
             if (data.success) {
               Toast.success('Attendance marked successfully!', 'Success');
               // Reload summary
@@ -332,6 +428,7 @@ if ($userData) {
 
     // Load data on page load
     loadDashboardData();
+    loadWeeklySchedule();
   </script>
 </body>
 
