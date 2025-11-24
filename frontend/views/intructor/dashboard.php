@@ -110,6 +110,53 @@ $assignedSubjectsCount = count($assignedSubjects);
           </div>
         </div>
 
+        <!-- Weekly Schedule Section -->
+        <div class="dashboard-section">
+          <div class="dashboard-section-header">
+            <h2 class="dashboard-section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-16.5 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-16.5 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+              </svg>
+              Weekly Schedule
+            </h2>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <div class="schedule-grid">
+                <?php
+                // Get the weekly schedule
+                $weeklySchedule = $instructor ? $instructorModel->getWeeklySchedule($instructor['id']) : [];
+                $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                
+                foreach ($days as $day): 
+                    $hasClasses = !empty($weeklySchedule[$day]);
+                ?>
+                  <div class="schedule-day">
+                    <div class="schedule-day-header"><?php echo $day; ?></div>
+                    <?php if ($hasClasses): ?>
+                      <?php foreach ($weeklySchedule[$day] as $class): ?>
+                        <div class="schedule-item">
+                          <div class="schedule-item-time"><?php echo htmlspecialchars($class['time']); ?></div>
+                          <div class="schedule-item-subject"><?php echo htmlspecialchars($class['subject_name']); ?></div>
+                          <div class="schedule-item-section">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 0.75rem; height: 0.75rem; color: #6b7280;">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 6.627-5.373 12-12 12s-12-5.373-12-12 5.373-12 12-12 12 5.373 12 12z" />
+                            </svg>
+                            <?php echo htmlspecialchars($class['section'] . ' | ' . $class['room']); ?>
+                          </div>
+                        </div>
+                      <?php endforeach; ?>
+                    <?php else: ?>
+                      <div class="no-classes">No classes scheduled</div>
+                    <?php endif; ?>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Assigned Subjects Section -->
         <div class="dashboard-section">
           <div class="dashboard-section-header">
@@ -306,52 +353,6 @@ $assignedSubjectsCount = count($assignedSubjects);
                   </tr>
                 </tbody>
               </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Weekly Class Schedule -->
-        <div class="dashboard-section">
-          <div class="dashboard-section-header">
-            <h2 class="dashboard-section-title">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-16.5 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-16.5 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-              </svg>
-              Weekly Class Schedule
-            </h2>
-          </div>
-          <div class="card">
-            <div class="card-body">
-              <div class="schedule-grid">
-                <div class="schedule-day">
-                  <div class="schedule-day-header">Monday</div>
-                  <div class="schedule-item empty">No classes scheduled</div>
-                </div>
-                <div class="schedule-day">
-                  <div class="schedule-day-header">Tuesday</div>
-                  <div class="schedule-item empty">No classes scheduled</div>
-                </div>
-                <div class="schedule-day">
-                  <div class="schedule-day-header">Wednesday</div>
-                  <div class="schedule-item empty">No classes scheduled</div>
-                </div>
-                <div class="schedule-day">
-                  <div class="schedule-day-header">Thursday</div>
-                  <div class="schedule-item empty">No classes scheduled</div>
-                </div>
-                <div class="schedule-day">
-                  <div class="schedule-day-header">Friday</div>
-                  <div class="schedule-item empty">No classes scheduled</div>
-                </div>
-                <div class="schedule-day">
-                  <div class="schedule-day-header">Saturday</div>
-                  <div class="schedule-item empty">No classes scheduled</div>
-                </div>
-                <div class="schedule-day">
-                  <div class="schedule-day-header">Sunday</div>
-                  <div class="schedule-item empty">No classes scheduled</div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

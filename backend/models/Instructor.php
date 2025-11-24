@@ -105,6 +105,66 @@ class Instructor {
                 
         return $this->db->fetchAll($sql, [':instructor_id' => $instructorId]);
     }
+
+    /**
+     * Get weekly schedule for an instructor
+     * 
+     * @param int $instructorId The ID of the instructor
+     * @return array Weekly schedule organized by day of the week
+     */
+    public function getWeeklySchedule($instructorId) {
+        // Get all assigned subjects with their schedules
+        $subjects = $this->getAssignedSubjects($instructorId);
+        
+        // Initialize the weekly schedule with empty arrays for each day
+        $weeklySchedule = [
+            'Monday' => [],
+            'Tuesday' => [],
+            'Wednesday' => [],
+            'Thursday' => [],
+            'Friday' => [],
+            'Saturday' => [],
+            'Sunday' => []
+        ];
+        
+        // Process each subject's schedule
+        foreach ($subjects as $subject) {
+            if (!empty($subject['schedule'])) {
+                // Parse the schedule string (format: "Day Time - Time, Room")
+                // Example: "Monday 08:00 AM - 10:00 AM, Room 301"
+                $scheduleParts = explode(',', $subject['schedule'], 2);
+                $timePart = trim($scheduleParts[0]);
+                $room = isset($scheduleParts[1]) ? trim($scheduleParts[1]) : ($subject['room'] ?? 'TBA');
+                
+                // Extract day and time
+                $day = '';
+                $timeRange = '';
+                $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                
+                foreach ($days as $dayName) {
+                    $pos = stripos($timePart, $dayName);
+                    if ($pos !== false) {
+                        $day = $dayName;
+                        $timeRange = trim(str_replace($dayName, '', $timePart));
+                        break;
+                    }
+                }
+                
+                // If day is found, add to the weekly schedule
+                if ($day && $timeRange) {
+                    $weeklySchedule[$day][] = [
+                        'subject_code' => $subject['code'],
+                        'subject_name' => $subject['name'],
+                        'section' => $subject['section'],
+                        'time' => $timeRange,
+                        'room' => $room
+                    ];
+                }
+            }
+        }
+        
+        return $weeklySchedule;
+    }
 }
 
 

@@ -1,5 +1,79 @@
 /* Instructor Dashboard Styles */
 
+/* Weekly Schedule Grid */
+.schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.schedule-day {
+  background-color: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.schedule-day-header {
+  background-color: #1A2B47;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+}
+
+.schedule-item {
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.schedule-item:last-child {
+  border-bottom: none;
+}
+
+.schedule-item-time {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1A2B47;
+  margin-bottom: 0.25rem;
+}
+
+.schedule-item-subject {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.schedule-item-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.no-classes {
+  padding: 1rem;
+  color: #666;
+  font-style: italic;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .schedule-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .schedule-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Layout */
 .main-layout {
     display: flex;
