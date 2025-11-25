@@ -34,7 +34,7 @@ window.EMAILJS_PARENT_CONFIG = {
     retryDelay: 2000,                 // Delay between retries in milliseconds
 
     // Debug mode
-    debug: true                       // Set to true to log email sending details to console
+    debug: false                      // Set to true to log non-sensitive email details
 };
 
 /**
@@ -62,8 +62,17 @@ window.EMAILJS_PARENT_CONFIG = {
             'See PARENT_EMAIL_SETUP_GUIDE.md for detailed instructions.'
         );
     } else {
+        const maskValue = (value = '') => {
+            if (value.length <= 6) return '***';
+            return `${value.substring(0, 3)}***${value.substring(value.length - 3)}`;
+        };
+
         console.log('[EmailJS Parent] ✅ Configuration loaded successfully');
-        console.log('[EmailJS Parent] Service ID:', config.serviceId);
-        console.log('[EmailJS Parent] Templates:', config.templates);
+
+        if (config.debug) {
+            console.log('[EmailJS Parent] Service ID:', maskValue(config.serviceId));
+            console.log('[EmailJS Parent] Public Key:', maskValue(config.publicKey));
+            console.log('[EmailJS Parent] Templates:', Object.keys(config.templates || {}));
+        }
     }
 })();

@@ -357,12 +357,24 @@ class AttendanceController
             $sessionStartTime = $session['start_time'];
             $sessionEndTime = $session['end_time'];
 
-            // If session hasn't ended yet, calculate expected end time (start + 2 hours)
+            // If session hasn't ended yet, use the subject's scheduled end time
             if (!$sessionEndTime) {
-                $startDateTime = new DateTime($session['session_date'] . ' ' . $sessionStartTime);
-                $endDateTime = clone $startDateTime;
-                $endDateTime->modify('+2 hours');
-                $sessionEndTime = $endDateTime->format('H:i:s');
+                // Get the scheduled window for this session date
+                $scheduleWindow = Helper::getScheduleWindowForDate(
+                    $subject['schedule'],
+                    $session['session_date']
+                );
+
+                if ($scheduleWindow && !empty($scheduleWindow['end_time'])) {
+                    // Use the actual scheduled end time from the subject
+                    $sessionEndTime = $scheduleWindow['end_time'];
+                } else {
+                    // Fallback: if no schedule found, use start_time + 2 hours
+                    $startDateTime = new DateTime($session['session_date'] . ' ' . $sessionStartTime);
+                    $endDateTime = clone $startDateTime;
+                    $endDateTime->modify('+2 hours');
+                    $sessionEndTime = $endDateTime->format('H:i:s');
+                }
             }
 
             $windowLabel = sprintf(

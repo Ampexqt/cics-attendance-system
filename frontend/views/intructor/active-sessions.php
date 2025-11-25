@@ -308,7 +308,7 @@ function getStatusBadgeClass($status)
 
           // If ending a session, trigger parent email notifications
           if (endpoint === 'end-session' && result.data && result.data.session_id) {
-            sendParentNotifications(result.data.session_id);
+            await sendParentNotifications(result.data.session_id);
           }
 
           Toast.success(successMessage);
@@ -323,12 +323,18 @@ function getStatusBadgeClass($status)
       // Send parent email notifications after session ends
       const sendParentNotifications = async (sessionId) => {
         try {
-          if (window.parentEmailNotifier) {
-            const result = await window.parentEmailNotifier.sendSessionNotifications(sessionId);
+          if (!window.parentEmailNotifier) {
+            console.warn('[Parent Notifications] Not initialized');
+            return;
+          }
 
-            if (result.success && result.sent > 0) {
-              console.log(`[Parent Notifications] Sent ${result.sent} emails, ${result.failed} failed`);
-            }
+          const result = await window.parentEmailNotifier.sendSessionNotifications(sessionId);
+
+          if (result.success && result.sent > 0) {
+            console.log(`[Parent Notifications] Sent ${result.sent} emails, ${result.failed} failed`);
+          } else if (!result.success) {
+            Toast.warning(result.message || 'Unable to send parent emails right now.');
+            console.warn('[Parent Notifications] Failed:', result.message);
           }
         } catch (error) {
           console.error('[Parent Notifications] Error:', error);

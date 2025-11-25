@@ -71,10 +71,51 @@ class EmailService
      * @param int $sessionId
      * @return array Array of parent information with student details
      */
-    public function getParentsForSession($sessionId)
+    public function getParentsForSession($session)
     {
-        // FIXED: Use attendance_records directly instead of complex program/year/section matching
-        // This ensures we only get parents for students who actually attended
+        // Accept either a session array or an ID
+        if (is_numeric($session)) {
+            $sessionDetails = $this->getSessionDetails((int)$session);
+        } elseif (is_array($session) && isset($session['id'])) {
+            $sessionDetails = $session;
+        } else {
+            $sessionDetails = null;
+        }
+
+        if (!$sessionDetails) {
+            return [];
+        }
+
+        $program = $sessionDetails['program'] ?? null;
+        $yearLevel = $sessionDetails['year_level'] ?? null;
+        $section = strtoupper(trim($sessionDetails['section'] ?? ''));
+
+        // If subject metadata is missing, fall back to previously attended-only list
+        if (!$program || !$yearLevel) {
+            $sql = "SELECT DISTINCT
+                        p.id as parent_id,
+                        p.first_name as parent_first_name,
+                        p.last_name as parent_last_name,
+                        p.email as parent_email,
+                        p.contact_number as parent_contact,
+                        p.relationship,
+                        s.id as student_id,
+                        s.student_id as student_number,
+                        s.first_name as student_first_name,
+                        s.last_name as student_last_name,
+                        s.program,
+                        s.year_level,
+                        s.section
+                    FROM parents p
+                    INNER JOIN students s ON p.student_id = s.id
+                    INNER JOIN attendance_records ar ON ar.student_id = s.id
+                    WHERE ar.session_id = :fallback_session_id
+                    AND p.email IS NOT NULL
+                    AND p.email != ''";
+
+            return $this->db->fetchAll($sql, [':fallback_session_id' => $sessionDetails['id']]);
+        }
+
         $sql = "SELECT DISTINCT
                     p.id as parent_id,
                     p.first_name as parent_first_name,
@@ -88,15 +129,41 @@ class EmailService
                     s.last_name as student_last_name,
                     s.program,
                     s.year_level,
-                    s.section
+                    s.section,
+                    ar.status as attendance_status,
+                    ar.time_in,
+                    ar.time_out
                 FROM parents p
                 INNER JOIN students s ON p.student_id = s.id
-                INNER JOIN attendance_records ar ON ar.student_id = s.id
-                WHERE ar.session_id = :session_id
-                AND p.email IS NOT NULL
-                AND p.email != ''";
+                LEFT JOIN attendance_records ar 
+                    ON ar.student_id = s.id
+                    AND ar.session_id = :session_id
+                WHERE p.email IS NOT NULL
+                  AND p.email != ''
+                  AND s.program = :program
+                  AND s.year_level = :year_level";
 
-        return $this->db->fetchAll($sql, [':session_id' => $sessionId]);
+        $params = [
+            ':session_id' => $sessionDetails['id'],
+            ':program' => $program,
+            ':year_level' => $yearLevel
+        ];
+
+        if (!empty($section)) {
+            $sql .= " AND (
+                UPPER(TRIM(s.section)) = :section_exact
+                OR UPPER(TRIM(s.section)) LIKE CONCAT('%', :section_suffix)
+                OR :section_prefix LIKE CONCAT('%', UPPER(TRIM(s.section)))
+            )";
+
+            $params[':section_exact'] = $section;
+            $params[':section_suffix'] = $section;
+            $params[':section_prefix'] = $section;
+        }
+
+        $sql .= " ORDER BY s.last_name ASC, s.first_name ASC";
+
+        return $this->db->fetchAll($sql, $params);
     }
 
     /**
