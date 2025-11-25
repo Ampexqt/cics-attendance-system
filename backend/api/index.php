@@ -314,6 +314,46 @@ try {
             }
             break;
 
+        case 'email':
+            $emailController = new EmailController();
+            switch ($action) {
+                case 'session-notifications':
+                    if ($method === 'GET') {
+                        $emailController->getSessionNotifications();
+                    } else {
+                        Response::error('Method not allowed', null, 405);
+                    }
+                    break;
+
+                case 'log-notification':
+                    if ($method === 'POST') {
+                        $emailController->logNotification();
+                    } else {
+                        Response::error('Method not allowed', null, 405);
+                    }
+                    break;
+
+                case 'stats':
+                    if ($method === 'GET') {
+                        $emailController->getNotificationStats();
+                    } else {
+                        Response::error('Method not allowed', null, 405);
+                    }
+                    break;
+
+                case 'recent':
+                    if ($method === 'GET') {
+                        $emailController->getRecentNotifications();
+                    } else {
+                        Response::error('Method not allowed', null, 405);
+                    }
+                    break;
+
+                default:
+                    Response::notFound('Email endpoint not found');
+            }
+            break;
+
         default:
             Response::notFound('API endpoint not found');
     }

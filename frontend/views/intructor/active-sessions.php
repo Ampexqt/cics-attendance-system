@@ -43,6 +43,9 @@ function formatYearLevelLabel($yearLevel)
       case 3:
         $suffix = 'rd';
         break;
+      case 4:
+        $suffix = 'th';
+        break;
     }
   }
 
@@ -303,12 +306,32 @@ function getStatusBadgeClass($status)
             throw new Error(result.message || 'Something went wrong');
           }
 
+          // If ending a session, trigger parent email notifications
+          if (endpoint === 'end-session' && result.data && result.data.session_id) {
+            sendParentNotifications(result.data.session_id);
+          }
+
           Toast.success(successMessage);
           setTimeout(() => window.location.reload(), 600);
         } catch (error) {
           Toast.error(error.message || 'Unable to complete the action');
           button.disabled = false;
           button.textContent = originalText;
+        }
+      };
+
+      // Send parent email notifications after session ends
+      const sendParentNotifications = async (sessionId) => {
+        try {
+          if (window.parentEmailNotifier) {
+            const result = await window.parentEmailNotifier.sendSessionNotifications(sessionId);
+
+            if (result.success && result.sent > 0) {
+              console.log(`[Parent Notifications] Sent ${result.sent} emails, ${result.failed} failed`);
+            }
+          }
+        } catch (error) {
+          console.error('[Parent Notifications] Error:', error);
         }
       };
 
@@ -404,6 +427,10 @@ function getStatusBadgeClass($status)
       });
     });
   </script>
+  <!-- EmailJS for Parent Notifications -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script src="../../assets/js/emailjs-parent-config.js"></script>
+  <script src="../../assets/js/parent-email-notifier.js"></script>
   <script src="../../assets/js/auto-end-sessions.js"></script>
 </body>
 

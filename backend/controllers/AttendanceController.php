@@ -309,7 +309,9 @@ class AttendanceController
 
             $this->attendanceModel->endSession($session['id']);
 
-            Response::success('Attendance session ended successfully');
+            Response::success('Attendance session ended successfully', [
+                'session_id' => $session['id']
+            ]);
         } catch (\Throwable $e) {
             error_log("endSession Error: " . $e->getMessage());
             error_log("Stack trace: " . $e->getTraceAsString());
