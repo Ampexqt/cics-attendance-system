@@ -216,8 +216,8 @@
         submitBtn.disabled = true;
         submitBtn.textContent = 'Initializing...';
 
-        // Generate fingerprint
-        deviceFingerprintValue = await DeviceFingerprint.generate();
+        // Generate stable fingerprint suitable for matching during login
+        deviceFingerprintValue = await DeviceFingerprint.generateStable();
         document.getElementById('deviceFingerprint').value = deviceFingerprintValue;
 
         // Re-enable submit button

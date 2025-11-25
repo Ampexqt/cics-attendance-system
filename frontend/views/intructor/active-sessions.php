@@ -9,6 +9,7 @@ $userId = $_SESSION['user_id'] ?? null;
 // Initialize models
 require_once __DIR__ . '/../../../backend/models/Instructor.php';
 require_once __DIR__ . '/../../../backend/models/Attendance.php';
+require_once __DIR__ . '/../../../backend/utils/Helper.php';
 
 $instructorModel = new Instructor();
 $attendanceModel = new Attendance();
@@ -57,31 +58,25 @@ function formatDurationLabel(?string $timeIn)
   if (!$timeIn) {
     return '—';
   }
-
   try {
     $timeInObj = new DateTime($timeIn);
     $now = new DateTime();
-
-    // Check if time_in is in the future
     if ($timeInObj > $now) {
-      return 'Just now';
+      return '0 mins';
     }
-
-    $interval = $timeInObj->diff($now);
-
-    // Calculate total minutes including days
-    $totalMinutes = ($interval->days * 24 * 60) + ($interval->h * 60) + $interval->i;
-
-    // If duration is > 5 hours (300 mins), assume stale/forgotten session
+    $diffSeconds = $now->getTimestamp() - $timeInObj->getTimestamp();
+    $totalMinutes = max(0, floor($diffSeconds / 60));
     if ($totalMinutes > 300) {
       return '—';
     }
-
-    if ($totalMinutes <= 0) {
-      return 'Just now';
+    $interval = $timeInObj->diff($now);
+    if ($interval->days >= 1) {
+      return $interval->days . ' day' . ($interval->days > 1 ? 's' : '') . ' ago';
+    } elseif ($interval->h >= 1) {
+      return $interval->h . ' hour' . ($interval->h > 1 ? 's' : '') . ' ago';
+    } else {
+      return $totalMinutes . ' min' . ($totalMinutes !== 1 ? 's' : '');
     }
-
-    return "{$totalMinutes} mins";
   } catch (Exception $e) {
     return '—';
   }
@@ -147,9 +142,24 @@ function getStatusBadgeClass($status)
               if ($session && !empty($session['start_time'])) {
                 $startTime = DateTime::createFromFormat('H:i:s', $session['start_time']);
                 if ($startTime) {
-                  $endTime = !empty($session['end_time'])
-                    ? DateTime::createFromFormat('H:i:s', $session['end_time'])
-                    : (clone $startTime)->modify('+2 hours');
+                  // Determine end time: use session's end_time if set, else use scheduled end time, else fallback to +2 hours
+                  $endTime = null;
+                  
+                  if (!empty($session['end_time'])) {
+                    // Session already ended
+                    $endTime = DateTime::createFromFormat('H:i:s', $session['end_time']);
+                  } else {
+                    // Session is active - get scheduled end time from subject schedule
+                    $scheduleWindow = Helper::getScheduleWindowForDate($subject['schedule'], $session['session_date']);
+                    if ($scheduleWindow && !empty($scheduleWindow['end_time'])) {
+                      $endTime = DateTime::createFromFormat('H:i:s', $scheduleWindow['end_time']);
+                    } else {
+                      // Fallback: no schedule found, use start + 2 hours
+                      $endTime = clone $startTime;
+                      $endTime->modify('+2 hours');
+                    }
+                  }
+                  
                   $timeRange = $startTime->format('h:i A') . ' - ' . $endTime->format('h:i A');
                 }
               }
@@ -241,16 +251,11 @@ function getStatusBadgeClass($status)
                           $fullName = trim($student['first_name'] . ' ' . $student['last_name']);
                           $yearLabel = formatYearLevelLabel((int) $student['year_level']);
 
-                          // Format Time-In: show date if not today
+                          // Format Time-In: show time only (no date)
                           $timeInObj = $student['time_in'] ? new DateTime($student['time_in']) : null;
                           $timeInLabel = '—';
                           if ($timeInObj) {
-                            $now = new DateTime();
-                            if ($timeInObj->format('Y-m-d') === $now->format('Y-m-d')) {
-                              $timeInLabel = $timeInObj->format('h:i A');
-                            } else {
-                              $timeInLabel = $timeInObj->format('M d, h:i A');
-                            }
+                            $timeInLabel = $timeInObj->format('h:i A');
                           }
                         ?>
                           <tr>

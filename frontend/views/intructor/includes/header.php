@@ -11,8 +11,20 @@
       </svg>
     </button>
     <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
-      <div class="instructor-avatar">JD</div>
-      <span class="instructor-name">Prof. John Doe</span>
+      <div title="Profile">
+        <?php
+        // Prefer a project PNG if present on disk and fall back to an inline SVG avatar to avoid broken images.
+        $profileImgFile = __DIR__ . '/../../../assets/img/Instructor-Profile.png';
+        $profileImgUrl = '/frontend/assets/img/Instructor-Profile.png';
+        if (file_exists($profileImgFile)) {
+            // Use a root-relative URL; if your setup serves assets from a different base, update this path.
+            echo '<img src="' . $profileImgUrl . '" alt="Profile" class="minimalist-avatar-img">';
+        } else {
+            // Inline minimalist SVG avatar (always renders)
+            echo '\n<div class="minimalist-avatar" aria-hidden="true">\n  <svg class="minimalist-avatar-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">\n    <circle cx="12" cy="8" r="3.2" fill="#fff" stroke="#2b3b4a" stroke-width="0.8"/>\n    <path d="M4 20c1.6-4 6.4-6 8-6s6.4 2 8 6" fill="#fff" stroke="#2b3b4a" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>\n  </svg>\n</div>\n';
+        }
+        ?>
+      </div>
     </div>
     <button class="btn-icon" title="Logout" id="instructorHeaderLogoutBtn">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">

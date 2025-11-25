@@ -23,6 +23,22 @@ const DeviceFingerprint = {
     },
 
     /**
+     * Generate a more stable fingerprint using only deterministic components.
+     * This avoids relying on canvas/audio/webgl which can vary between sessions
+     * or be blocked by privacy settings. Use this for registration/login matching.
+     * @returns {Promise<string>} Stable device fingerprint
+     */
+    async generateStable() {
+        try {
+            const components = this.collectStableComponents();
+            const fingerprint = await this.hashComponents(components);
+            return fingerprint;
+        } catch (error) {
+            return this.generateFallbackFingerprint();
+        }
+    },
+
+    /**
      * Collect various browser/device characteristics
      * @returns {Promise<Object>} Object containing device characteristics
      */
@@ -42,6 +58,23 @@ const DeviceFingerprint = {
         };
 
         return components;
+    },
+
+    /**
+     * Collect a smaller set of deterministic components for a stable fingerprint.
+     * Avoids canvas/webgl/audio/fonts/plugins which may change.
+     */
+    collectStableComponents() {
+        return {
+            deviceModel: this.getDeviceModel(),
+            platform: navigator.platform,
+            screenResolution: `${screen.width}x${screen.height}`,
+            screenColorDepth: screen.colorDepth,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            timezoneOffset: new Date().getTimezoneOffset(),
+            language: navigator.language,
+            touchSupport: this.hasTouchSupport()
+        };
     },
 
     /**

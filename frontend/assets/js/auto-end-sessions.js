@@ -38,25 +38,38 @@
         
         if (!match) return;
         
+        const startTimeStr = match[1]; // e.g., "03:23 AM"
         const endTimeStr = match[2]; // e.g., "03:26 AM"
         const now = new Date();
-        
-        // Parse the end time
-        const [time, period] = endTimeStr.split(/\s+/);
-        const [hours, minutes] = time.split(':').map(Number);
-        let endHours = hours;
-        
-        if (period.toUpperCase() === 'PM' && hours !== 12) {
-          endHours += 12;
-        } else if (period.toUpperCase() === 'AM' && hours === 12) {
-          endHours = 0;
+
+        // Helper to parse a hh:mm AM/PM string into a Date object for today
+        function parseTimeToDate(timeStr) {
+          const parts = timeStr.trim().split(/\s+/);
+          const [timePart, periodPart] = parts.length === 2 ? parts : [parts[0], ''];
+          const [h, m] = timePart.split(':').map(Number);
+          let hh = h;
+          const period = (periodPart || '').toUpperCase();
+          if (period === 'PM' && hh !== 12) hh += 12;
+          if (period === 'AM' && hh === 12) hh = 0;
+          const d = new Date();
+          d.setHours(hh, m, 0, 0);
+          return d;
         }
-        
-        const endTime = new Date();
-        endTime.setHours(endHours, minutes, 0, 0);
-        
-        // If current time is past the scheduled end time, auto-end the session
-        if (now > endTime) {
+
+        const startTime = parseTimeToDate(startTimeStr);
+        let endTime = parseTimeToDate(endTimeStr);
+
+        // If endTime is before or equal to startTime, assume it wraps to the next day
+        if (endTime.getTime() <= startTime.getTime()) {
+          endTime.setDate(endTime.getDate() + 1);
+        }
+
+        // If endTime is still before now but it shouldn't be (race condition), allow a short grace period
+        const GRACE_SECONDS = 30; // don't auto-end within this many seconds of now to avoid immediate endings
+        const effectiveEndTime = new Date(endTime.getTime() + GRACE_SECONDS * 1000);
+
+        // If current time is past the scheduled end time (with grace), auto-end the session
+        if (now > effectiveEndTime) {
           const endButton = card.querySelector('.end-session-btn');
           if (endButton) {
             const sessionId = endButton.dataset.sessionId;

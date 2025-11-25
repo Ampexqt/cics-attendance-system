@@ -13,7 +13,7 @@ $instructorModel = new Instructor();
 // Get instructor details and weekly schedule
 $instructor = $instructorModel->findByUserId($userId);
 $weeklySchedule = $instructor ? $instructorModel->getWeeklySchedule($instructor['id']) : [];
-$days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+$days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,6 +49,7 @@ $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Su
               ?>
                 <div class="schedule-day">
                   <div class="schedule-day-header"><?php echo $day; ?></div>
+                  <div class="schedule-day-body">
                   <?php if ($hasClasses): ?>
                     <?php foreach ($weeklySchedule[$day] as $class): ?>
                       <div class="schedule-item">
@@ -66,6 +67,7 @@ $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Su
                   <?php else: ?>
                     <div class="no-classes">No classes scheduled</div>
                   <?php endif; ?>
+                  </div>
                 </div>
               <?php endforeach; ?>
             </div>

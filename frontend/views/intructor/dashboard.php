@@ -9,6 +9,9 @@ $userId = $_SESSION['user_id'] ?? null;
 // Initialize instructor model
 require_once __DIR__ . '/../../../backend/models/Instructor.php';
 $instructorModel = new Instructor();
+// Attendance model (for correction requests and sessions)
+require_once __DIR__ . '/../../../backend/models/Attendance.php';
+$attendanceModel = new Attendance();
 
 // Get instructor details
 $instructor = $instructorModel->findByUserId($userId);
@@ -21,6 +24,26 @@ if ($instructor) {
 
 // Count the number of assigned subjects
 $assignedSubjectsCount = count($assignedSubjects);
+// Prepare weekly schedule and counts for dashboard stats
+$weeklySchedule = $instructor ? $instructorModel->getWeeklySchedule($instructor['id']) : [];
+
+// Sections handling: count unique non-empty sections from assigned subjects
+$sectionsHandlingCount = 0;
+if (!empty($assignedSubjects)) {
+  $sections = array_filter(array_map('trim', array_column($assignedSubjects, 'section')));
+  $sectionsHandlingCount = count(array_unique($sections));
+}
+
+// Today's classes count
+$todayName = date('l'); // e.g., Monday
+$todaysClassesCount = isset($weeklySchedule[$todayName]) ? count($weeklySchedule[$todayName]) : 0;
+
+  // Pending correction requests for this instructor
+  $pendingCorrectionsCount = 0;
+  if ($instructor) {
+    $corrections = $attendanceModel->getInstructorCorrectionRequests($instructor['id']);
+    $pendingCorrectionsCount = is_array($corrections) ? count($corrections) : 0;
+  }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,18 +74,6 @@ $assignedSubjectsCount = count($assignedSubjects);
         <div class="dashboard-grid">
           <div class="stat-card">
             <div class="stat-card-header">
-              <h3 class="stat-card-title">Active Sessions</h3>
-              <div class="stat-card-icon primary">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-16.5 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-16.5 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                </svg>
-              </div>
-            </div>
-            <div class="stat-card-value">0</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-card-header">
               <h3 class="stat-card-title">Pending Corrections</h3>
               <div class="stat-card-icon warning">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -70,9 +81,8 @@ $assignedSubjectsCount = count($assignedSubjects);
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">0</div>
+            <div class="stat-card-value"><?php echo $pendingCorrectionsCount; ?></div>
           </div>
-
           <div class="stat-card">
             <div class="stat-card-header">
               <h3 class="stat-card-title">Subjects Assigned</h3>
@@ -94,7 +104,7 @@ $assignedSubjectsCount = count($assignedSubjects);
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">0</div>
+            <div class="stat-card-value"><?php echo $sectionsHandlingCount; ?></div>
           </div>
 
           <div class="stat-card">
@@ -106,7 +116,7 @@ $assignedSubjectsCount = count($assignedSubjects);
                 </svg>
               </div>
             </div>
-            <div class="stat-card-value">0</div>
+            <div class="stat-card-value"><?php echo $todaysClassesCount; ?></div>
           </div>
         </div>
 
@@ -126,13 +136,14 @@ $assignedSubjectsCount = count($assignedSubjects);
                 <?php
                 // Get the weekly schedule
                 $weeklySchedule = $instructor ? $instructorModel->getWeeklySchedule($instructor['id']) : [];
-                $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
                 
                 foreach ($days as $day): 
                     $hasClasses = !empty($weeklySchedule[$day]);
                 ?>
                   <div class="schedule-day">
                     <div class="schedule-day-header"><?php echo $day; ?></div>
+                    <div class="schedule-day-body">
                     <?php if ($hasClasses): ?>
                       <?php foreach ($weeklySchedule[$day] as $class): ?>
                         <div class="schedule-item">
@@ -150,6 +161,7 @@ $assignedSubjectsCount = count($assignedSubjects);
                     <?php else: ?>
                       <div class="no-classes">No classes scheduled</div>
                     <?php endif; ?>
+                    </div>
                   </div>
                 <?php endforeach; ?>
               </div>
@@ -206,132 +218,9 @@ $assignedSubjectsCount = count($assignedSubjects);
           <?php endif; ?>
         </div>
 
-        <!-- Active Attendance Sessions -->
-        <div class="dashboard-section">
-          <div class="dashboard-section-header">
-            <h2 class="dashboard-section-title">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-16.5 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-16.5 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-              </svg>
-              Active Attendance Sessions
-            </h2>
-          </div>
-          <div class="card">
-            <div class="card-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>SUBJECT</th>
-                    <th>SECTION</th>
-                    <th>TIME</th>
-                    <th>ROOM</th>
-                    <th>STATUS</th>
-                    <th>ACTION</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td colspan="6" class="text-center">No active sessions</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+        <!-- Active Attendance Sessions removed -->
 
-        <!-- Attendance Logs -->
-        <div class="dashboard-section">
-          <div class="dashboard-section-header">
-            <h2 class="dashboard-section-title">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-              </svg>
-              Attendance Logs
-            </h2>
-          </div>
-          <div class="card">
-            <div class="card-body">
-              <!-- Filter Controls -->
-              <div class="filter-controls">
-                <div class="filter-group">
-                  <label class="filter-label">Subject</label>
-                  <select class="form-select" style="width: 200px;">
-                    <option>No subjects available</option>
-                  </select>
-                </div>
-                <div class="filter-group">
-                  <label class="filter-label">Section</label>
-                  <select class="form-select" style="width: 200px;">
-                    <option>No sections available</option>
-                  </select>
-                </div>
-                <div class="filter-group">
-                  <label class="filter-label">Date</label>
-                  <input type="date" class="form-control" style="width: 200px;">
-                </div>
-                <div class="filter-group" style="flex: 1; min-width: 250px;">
-                  <label class="filter-label">Search</label>
-                  <div class="search-container">
-                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                    </svg>
-                    <input type="text" class="search-input" placeholder="Search students...">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Attendance Log Table -->
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>STUDENT NAME</th>
-                    <th>TIME-IN</th>
-                    <th>STATUS</th>
-                    <th>NOTES</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td colspan="4" class="text-center">No attendance records found</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Correction Requests -->
-        <div class="dashboard-section">
-          <div class="dashboard-section-header">
-            <h2 class="dashboard-section-title">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-              </svg>
-              Correction Requests
-            </h2>
-          </div>
-          <div class="card">
-            <div class="card-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>STUDENT NAME</th>
-                    <th>SUBJECT</th>
-                    <th>DATE</th>
-                    <th>REQUEST</th>
-                    <th>STATUS</th>
-                    <th>ACTION</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td colspan="6" class="text-center">No pending correction requests</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+        <!-- Attendance Logs and Correction Requests removed -->
       </div>
     </main>
   </div>
