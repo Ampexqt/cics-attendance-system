@@ -152,6 +152,26 @@ class Attendance
             $params[':program'] = $filters['program'];
         }
 
+        if (!empty($filters['instructor_id'])) {
+            $sql .= " AND sub.instructor_id = :instructor_id";
+            $params[':instructor_id'] = $filters['instructor_id'];
+        }
+
+        if (!empty($filters['subject_id'])) {
+            $sql .= " AND sub.id = :subject_id";
+            $params[':subject_id'] = $filters['subject_id'];
+        }
+
+        if (!empty($filters['section'])) {
+            $sql .= " AND s.section = :section";
+            $params[':section'] = $filters['section'];
+        }
+
+        if (!empty($filters['search'])) {
+            $sql .= " AND (s.first_name LIKE :search OR s.last_name LIKE :search OR s.student_id LIKE :search)";
+            $params[':search'] = '%' . $filters['search'] . '%';
+        }
+
         $sql .= " ORDER BY ases.session_date DESC, ar.time_in DESC";
 
         if (!empty($filters['limit'])) {

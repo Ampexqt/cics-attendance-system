@@ -54,12 +54,57 @@
   color: var(--text-primary);
   border-radius: var(--radius-lg);
   transition: all var(--transition-base);
+  border: none;
+  cursor: pointer;
 }
 
-.attendance-button:hover {
+.attendance-button:hover:not(:disabled) {
   background-color: var(--accent-gold);
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
+}
+
+.attendance-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Success state (Time-In) */
+.attendance-button.btn-success {
+  background-color: var(--success-green) !important;
+  color: var(--text-inverse) !important;
+}
+
+.attendance-button.btn-success:hover:not(:disabled) {
+  background-color: #059669 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Danger state (Time-Out) */
+.attendance-button.btn-danger {
+  background-color: var(--error-red) !important;
+  color: var(--text-inverse) !important;
+}
+
+.attendance-button.btn-danger:hover:not(:disabled) {
+  background-color: #dc2626 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Secondary state (Completed) */
+.attendance-button.btn-secondary {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+  border: 2px solid var(--text-secondary) !important;
+}
+
+.attendance-button.btn-secondary:hover:not(:disabled) {
+  background-color: var(--bg-primary) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-lg) !important;
 }
 
 .attendance-status {

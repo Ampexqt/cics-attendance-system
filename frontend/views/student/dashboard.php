@@ -261,6 +261,49 @@ if ($userData) {
   <script src="../../assets/js/auth.js"></script>
   <script>
     let studentActiveSession = null;
+    
+    // Session State Manager - Handles caching and persistence
+    const SessionStateManager = {
+      CACHE_KEY: 'student_active_session_cache',
+      CACHE_EXPIRY_KEY: 'student_active_session_expiry',
+      CACHE_DURATION: 30000, // 30 seconds cache
+      
+      getCachedState() {
+        const cached = sessionStorage.getItem(this.CACHE_KEY);
+        const expiry = sessionStorage.getItem(this.CACHE_EXPIRY_KEY);
+        
+        if (!cached || !expiry) return null;
+        
+        // Check if cache has expired
+        if (Date.now() > parseInt(expiry, 10)) {
+          this.clearCache();
+          return null;
+        }
+        
+        try {
+          return JSON.parse(cached);
+        } catch (e) {
+          console.warn('Failed to parse cached session state:', e);
+          this.clearCache();
+          return null;
+        }
+      },
+      
+      setCachedState(state) {
+        try {
+          sessionStorage.setItem(this.CACHE_KEY, JSON.stringify(state));
+          sessionStorage.setItem(this.CACHE_EXPIRY_KEY, (Date.now() + this.CACHE_DURATION).toString());
+        } catch (e) {
+          console.warn('Failed to cache session state:', e);
+        }
+      },
+      
+      clearCache() {
+        sessionStorage.removeItem(this.CACHE_KEY);
+        sessionStorage.removeItem(this.CACHE_EXPIRY_KEY);
+      }
+    };
+    
     // Helper function to convert 24-hour time to 12-hour format with AM/PM
     function formatTimeTo12Hour(time24) {
       if (!time24) return '';
@@ -270,6 +313,7 @@ if ($userData) {
       const hour12 = hour % 12 || 12;
       return `${hour12}:${minutes} ${ampm}`;
     }
+    
     // Check authentication on page load
     if (!AuthAPI.isAuthenticated()) {
       window.location.href = '/cics-attendance-system/login.php';
@@ -450,11 +494,23 @@ if ($userData) {
       }
     }
 
-    async function loadActiveSessionState() {
+    async function loadActiveSessionState(forceRefresh = false) {
       const statusContainer = document.querySelector('.attendance-status');
       const button = document.getElementById('attendanceBtn');
 
       try {
+        // Try to use cached state first if not forcing refresh
+        if (!forceRefresh) {
+          const cachedState = SessionStateManager.getCachedState();
+          if (cachedState) {
+            console.log('[Session] Using cached state');
+            updateUIWithSessionState(cachedState, button, statusContainer);
+            studentActiveSession = cachedState;
+            return;
+          }
+        }
+
+        // Fetch fresh data from server
         const response = await fetch('/cics-attendance-system/backend/api/attendance/student-active-session', {
           credentials: 'include'
         });
@@ -467,74 +523,102 @@ if ($userData) {
 
         if (response.ok && result.success && result.data) {
           studentActiveSession = result.data;
-          const subject = result.data.subject || {};
-          const windowLabel = result.data.window?.label || 'Session in progress';
-          const status = result.data.attendance_status; // 'none', 'timed_in', 'timed_out'
-
-          // Update Button State based on Attendance Status
-          button.disabled = false;
-          button.classList.remove('btn-danger', 'btn-success', 'btn-secondary');
-
-          if (status === 'timed_out') {
-            button.innerText = 'Completed';
-            button.disabled = true;
-            button.classList.add('btn-secondary');
-          } else if (status === 'timed_in') {
-            button.innerText = 'Time-Out';
-            button.classList.add('btn-danger'); // Make it red for Time-Out
-          } else {
-            button.innerText = 'Time-In';
-            button.classList.add('btn-success'); // Green for Time-In
-          }
-
-          statusContainer.innerHTML = `
-            <div class="status-item success">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>${subject.name || 'Active Session'} (${subject.code || 'N/A'})</span>
-            </div>
-            <div class="status-item info">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>${windowLabel}</span>
-            </div>
-          `;
+          
+          // Cache the state for future refreshes
+          SessionStateManager.setCachedState(result.data);
+          
+          // Update UI
+          updateUIWithSessionState(result.data, button, statusContainer);
         } else {
           studentActiveSession = null;
-          button.disabled = true;
-          button.innerText = 'No Active Session';
-          statusContainer.innerHTML = `
-            <div class="status-item info">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0" />
-              </svg>
-              <span>No active session available</span>
-            </div>
-            <div class="status-item warning">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12z" />
-              </svg>
-              <span>Wait for your instructor to start the session</span>
-            </div>
-          `;
+          SessionStateManager.clearCache();
+          updateUIWithNoSession(button, statusContainer);
         }
       } catch (error) {
         console.error('Error loading active session:', error);
-        studentActiveSession = null;
-        button.disabled = true;
-        statusContainer.innerHTML = `
-          <div class="status-item warning">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12z" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75-9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12z" />
-            </svg>
-            <span>Unable to load active session. Please refresh.</span>
-          </div>
-        `;
+        
+        // If error and we have cached state, use it instead of showing error
+        const cachedState = SessionStateManager.getCachedState();
+        if (cachedState && !forceRefresh) {
+          console.log('[Session] Using cached state after error');
+          studentActiveSession = cachedState;
+          updateUIWithSessionState(cachedState, button, statusContainer);
+        } else {
+          studentActiveSession = null;
+          SessionStateManager.clearCache();
+          updateUIWithError(button, statusContainer);
+        }
       }
+    }
+
+    function updateUIWithSessionState(sessionData, button, statusContainer) {
+      const subject = sessionData.subject || {};
+      const windowLabel = sessionData.window?.label || 'Session in progress';
+      const status = sessionData.attendance_status; // 'none', 'timed_in', 'timed_out'
+
+      // Update Button State based on Attendance Status
+      button.disabled = false;
+      button.classList.remove('btn-danger', 'btn-success', 'btn-secondary');
+
+      if (status === 'timed_out') {
+        button.innerText = 'Completed';
+        button.disabled = true;
+        button.classList.add('btn-secondary');
+      } else if (status === 'timed_in') {
+        button.innerText = 'Time-Out';
+        button.classList.add('btn-danger'); // Make it red for Time-Out
+      } else {
+        button.innerText = 'Time-In';
+        button.classList.add('btn-success'); // Green for Time-In
+      }
+
+      statusContainer.innerHTML = `
+        <div class="status-item success">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>${subject.name || 'Active Session'} (${subject.code || 'N/A'})</span>
+        </div>
+        <div class="status-item info">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>${windowLabel}</span>
+        </div>
+      `;
+    }
+
+    function updateUIWithNoSession(button, statusContainer) {
+      button.disabled = true;
+      button.innerText = 'No Active Session';
+      statusContainer.innerHTML = `
+        <div class="status-item info">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0" />
+          </svg>
+          <span>No active session available</span>
+        </div>
+        <div class="status-item warning">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12z" />
+          </svg>
+          <span>Wait for your instructor to start the session</span>
+        </div>
+      `;
+    }
+
+    function updateUIWithError(button, statusContainer) {
+      button.disabled = true;
+      statusContainer.innerHTML = `
+        <div class="status-item warning">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75-9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12z" />
+          </svg>
+          <span>Unable to load active session. Please refresh.</span>
+        </div>
+      `;
     }
 
     // Handle attendance button
@@ -705,8 +789,15 @@ if ($userData) {
 
             if (data.success) {
               Toast.success(`${actionText} successful!`, 'Success');
-              loadDashboardData();
-              loadActiveSessionState();
+              
+              // Clear cache and reload session state immediately
+              SessionStateManager.clearCache();
+              
+              // Small delay to ensure database is updated
+              setTimeout(() => {
+                loadActiveSessionState(true);
+                loadDashboardData();
+              }, 500);
             } else {
               Toast.error(data.message || `Failed to ${actionText}`, 'Error');
             }
@@ -724,6 +815,32 @@ if ($userData) {
     loadWeeklySchedule();
     loadTodaysSchedule();
     loadActiveSessionState();
+
+    // Auto-refresh session state every 15 seconds
+    let autoRefreshInterval = setInterval(() => {
+      loadActiveSessionState(false); // Use cache if available
+    }, 15000);
+
+    // Force refresh every 2 minutes to stay in sync with server
+    let forceRefreshInterval = setInterval(() => {
+      SessionStateManager.clearCache();
+      loadActiveSessionState(true); // Force fresh data from server
+    }, 120000);
+
+    // Refresh on page visibility change
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        console.log('[Session] Page became visible, refreshing session state');
+        SessionStateManager.clearCache();
+        loadActiveSessionState(true);
+      }
+    });
+
+    // Cleanup intervals on page unload
+    window.addEventListener('beforeunload', () => {
+      clearInterval(autoRefreshInterval);
+      clearInterval(forceRefreshInterval);
+    });
 
     // Check if mobile user is on HTTP and show warning
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);

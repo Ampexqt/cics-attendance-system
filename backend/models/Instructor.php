@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Instructor Model
  * CICS Attendance System
@@ -127,44 +127,145 @@ class Instructor {
             'Sunday' => []
         ];
         
-        // Process each subject's schedule
+        // Process each subject's schedule with enhanced parsing
         foreach ($subjects as $subject) {
             if (!empty($subject['schedule'])) {
-                // Parse the schedule string (format: "Day Time - Time, Room")
-                // Example: "Monday 08:00 AM - 10:00 AM, Room 301"
-                $scheduleParts = explode(',', $subject['schedule'], 2);
-                $timePart = trim($scheduleParts[0]);
-                $room = isset($scheduleParts[1]) ? trim($scheduleParts[1]) : ($subject['room'] ?? 'TBA');
+                // Parse the schedule string
+                $parsedSchedules = $this->parseScheduleString($subject['schedule']);
                 
-                // Extract day and time
-                $day = '';
-                $timeRange = '';
-                $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                
-                foreach ($days as $dayName) {
-                    $pos = stripos($timePart, $dayName);
-                    if ($pos !== false) {
-                        $day = $dayName;
-                        $timeRange = trim(str_replace($dayName, '', $timePart));
-                        break;
+                foreach ($parsedSchedules as $sched) {
+                    $day = $sched['day'];
+                    if (isset($weeklySchedule[$day])) {
+                        $weeklySchedule[$day][] = [
+                            'subject_code' => $subject['code'],
+                            'subject_name' => $subject['name'],
+                            'section' => $subject['section'],
+                            'time' => $sched['raw_time'],
+                            'start_time' => $sched['start_time'],
+                            'end_time' => $sched['end_time'],
+                            'room' => $subject['room'] ?? 'TBA'
+                        ];
                     }
-                }
-                
-                // If day is found, add to the weekly schedule
-                if ($day && $timeRange) {
-                    $weeklySchedule[$day][] = [
-                        'subject_code' => $subject['code'],
-                        'subject_name' => $subject['name'],
-                        'section' => $subject['section'],
-                        'time' => $timeRange,
-                        'room' => $room
-                    ];
                 }
             }
         }
         
+        // Sort each day's schedule by start time
+        foreach ($weeklySchedule as $day => &$daySchedule) {
+            usort($daySchedule, function ($a, $b) {
+                return strtotime($a['start_time']) - strtotime($b['start_time']);
+            });
+        }
+        
         return $weeklySchedule;
     }
+
+    /**
+     * Parse schedule strings like "MW 10:00-11:30" or "Monday 10:30am to 12:00pm"
+     * 
+     * @param string $scheduleStr The schedule string to parse
+     * @return array Array of parsed schedules with day, start_time, end_time, and raw_time
+     */
+    private function parseScheduleString($scheduleStr)
+    {
+        $results = [];
+        
+        // Normalize string
+        $scheduleStr = trim($scheduleStr);
+        
+        if (empty($scheduleStr)) {
+            return $results;
+        }
+
+        // Support multiple day/time segments separated by semicolons or pipes
+        $segments = preg_split('/;|\\\|/', $scheduleStr);
+
+        foreach ($segments as $segment) {
+            $segment = trim($segment);
+            if ($segment === '') continue;
+
+            // Regex to separate days from time in this segment
+            preg_match('/^([A-Za-z,\\s]+)\\s+(\\d{1,2}:.*)$/', $segment, $segMatches);
+
+            if (count($segMatches) < 3) {
+                // Could not parse this segment, skip
+                continue;
+            }
+
+            $segDaysPart = trim($segMatches[1]);
+            $segTimePart = trim($segMatches[2]);
+
+            $segDays = [];
+
+            // Check for full day names
+            $fullDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            $foundFullDay = false;
+            foreach ($fullDays as $fd) {
+                if (stripos($segDaysPart, $fd) !== false) {
+                    $segDays[] = $fd;
+                    $foundFullDay = true;
+                }
+            }
+
+            // If no full day found, try abbreviated parsing
+            if (!$foundFullDay) {
+                $daysMap = [
+                    'M' => 'Monday',
+                    'T' => 'Tuesday',
+                    'W' => 'Wednesday',
+                    'Th' => 'Thursday',
+                    'F' => 'Friday',
+                    'S' => 'Saturday',
+                    'Su' => 'Sunday'
+                ];
+
+                $tempDays = str_replace('Th', 'X', $segDaysPart);
+                $tempDays = str_replace('Su', 'Y', $tempDays);
+
+                // Remove spaces and commas
+                $tempDays = preg_replace('/[\\s,]/', '', $tempDays);
+
+                $chars = str_split($tempDays);
+                foreach ($chars as $char) {
+                    if ($char == 'X') $segDays[] = 'Thursday';
+                    elseif ($char == 'Y') $segDays[] = 'Sunday';
+                    elseif (isset($daysMap[$char])) $segDays[] = $daysMap[$char];
+                }
+            }
+
+            // Parse time for this segment
+            $segTimePart = str_ireplace(' to ', '-', $segTimePart);
+            $segTimePart = trim($segTimePart);
+
+            // Split by hyphen allowing spaces around it
+            $times = preg_split('/\\s*-\\s*/', $segTimePart);
+
+            if (count($times) == 2) {
+                $startTime = $this->formatTime($times[0]);
+                $endTime = $this->formatTime($times[1]);
+
+                foreach ($segDays as $day) {
+                    $results[] = [
+                        'day' => $day,
+                        'start_time' => $startTime,
+                        'end_time' => $endTime,
+                        'raw_time' => $segMatches[2]
+                    ];
+                }
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Format time string to 24-hour format (HH:mm)
+     * 
+     * @param string $timeStr The time string to format
+     * @return string Formatted time in HH:mm format
+     */
+    private function formatTime($timeStr)
+    {
+        return date('H:i', strtotime($timeStr));
+    }
 }
-
-

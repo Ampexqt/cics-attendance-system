@@ -3,9 +3,12 @@
 /* Weekly Schedule Grid */
 .schedule-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: var(--spacing-md);
+    /* Allow the schedule to adapt to available width and wrap rows instead
+       of causing horizontal overflow. Makes cards larger and more detailed. */
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--spacing-lg);
     margin-top: var(--spacing-lg);
+    overflow: visible;
 }
 
 .schedule-day {
@@ -17,7 +20,8 @@
     display: flex;
     flex-direction: column;
     transition: box-shadow var(--transition-fast), transform var(--transition-fast);
-    min-height: 220px; /* reduced to remove large empty area */
+    min-height: 360px; /* larger cards for more detailed view */
+    min-width: 0; /* allow grid items to shrink and enable text truncation */
 }
 
 .schedule-day:hover {
@@ -45,6 +49,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    min-width: 0; /* prevent long text from forcing width in flex children */
 }
 
 .schedule-item:hover {
@@ -57,42 +62,42 @@
 }
 
 .schedule-item-time {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
     color: var(--primary-blue);
     margin-bottom: var(--spacing-xs);
-    display: block;
     letter-spacing: 0.3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* Allow multi-line time ranges for clarity (no truncation) */
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    word-break: break-word;
 }
 
 .schedule-item-subject {
     font-weight: var(--font-weight-semibold);
     margin-bottom: var(--spacing-xs);
     color: var(--text-primary);
-    font-size: var(--font-size-sm);
-    line-height: 1.3;
+    font-size: var(--font-size-md);
+    line-height: 1.35;
+    /* Show full subject title on multiple lines if needed */
     white-space: normal;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    max-height: 2.6rem;
+    overflow: visible;
+    text-overflow: unset;
+    max-height: none;
 }
 
 .schedule-item-section {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: var(--spacing-xs);
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-sm);
     color: var(--text-secondary);
     line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* allow the section details (room, section) to wrap if necessary */
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
 }
 
 .schedule-item-section svg {
@@ -101,6 +106,17 @@
     flex-shrink: 0;
     margin-top: 2px;
     color: var(--gray-400);
+}
+
+.schedule-more {
+    font-size: 0.85rem;
+    color: var(--primary-blue);
+    padding: 0.35rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(10, 127, 219, 0.05);
+    display: inline-block;
+    margin-top: 0.25rem;
+    cursor: default;
 }
 
 .no-classes {
@@ -113,7 +129,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100px;
+    min-height: 140px;
 }
 
 /* Make the schedule day body fill available space so items stick to the top */
@@ -123,7 +139,8 @@
     flex-direction: column;
     gap: var(--spacing-sm);
     flex: 1 1 auto;
-    overflow: hidden;
+    /* Let content determine height so items are visible without scroll */
+    overflow: visible;
 }
 
 /* Responsive adjustments */

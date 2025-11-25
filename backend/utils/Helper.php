@@ -101,12 +101,17 @@ class Helper
 
         $timeInObj = new DateTime($timeIn);
         $sessionStartObj = new DateTime($sessionStartTime);
-        $diff = $timeInObj->diff($sessionStartObj);
+        
+        // If time_in is before or equal to session start time, mark as present
+        if ($timeInObj <= $sessionStartObj) {
+            return 'present';
+        }
+        
+        // Calculate how many minutes late
+        $diff = $timeInObj->diff($sessionStartObj, true); // absolute difference
         $minutesLate = ($diff->h * 60) + $diff->i;
 
-        if ($minutesLate <= 0) {
-            return 'present';
-        } elseif ($minutesLate <= $lateThreshold) {
+        if ($minutesLate <= $lateThreshold) {
             return 'late';
         } elseif ($minutesLate <= $absentThreshold) {
             return 'late';

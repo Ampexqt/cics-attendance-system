@@ -27,6 +27,45 @@ $assignedSubjectsCount = count($assignedSubjects);
 // Prepare weekly schedule and counts for dashboard stats
 $weeklySchedule = $instructor ? $instructorModel->getWeeklySchedule($instructor['id']) : [];
 
+// If the model returned an empty schedule (parsing may fail for some schedule formats),
+// build a safe fallback by scanning the assigned subjects' schedule strings for day names.
+$daysList = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+$hasAny = false;
+foreach ($daysList as $d) { if (!empty($weeklySchedule[$d])) { $hasAny = true; break; } }
+if (!$hasAny && !empty($assignedSubjects)) {
+  // initialize empty structure
+  $weeklySchedule = array_fill_keys($daysList, []);
+
+  foreach ($assignedSubjects as $subject) {
+    $schedStr = trim($subject['schedule'] ?? '');
+    if ($schedStr === '') continue;
+
+    // Split into segments by semicolon (common separator). This ensures a Saturday segment
+    // that appears after a semicolon won't be erroneously attached to the previous day.
+    $segments = preg_split('/\s*;\s*/', $schedStr);
+
+    foreach ($segments as $segment) {
+      $segment = trim($segment);
+      if ($segment === '') continue;
+
+      // Attribute this segment only to the exact day it mentions
+      foreach ($daysList as $day) {
+        if (stripos($segment, $day) !== false) {
+          $weeklySchedule[$day][] = [
+            'subject_code' => $subject['code'] ?? '',
+            'subject_name' => $subject['name'] ?? '',
+            'section' => $subject['section'] ?? '',
+            'time' => $segment,
+            'start_time' => date('H:i', strtotime($segment)) ?: '00:00',
+            'end_time' => date('H:i', strtotime($segment)) ?: '00:00',
+            'room' => $subject['room'] ?? 'TBA'
+          ];
+        }
+      }
+    }
+  }
+}
+
 // Sections handling: count unique non-empty sections from assigned subjects
 $sectionsHandlingCount = 0;
 if (!empty($assignedSubjects)) {
@@ -134,18 +173,22 @@ $todaysClassesCount = isset($weeklySchedule[$todayName]) ? count($weeklySchedule
             <div class="card-body">
               <div class="schedule-grid">
                 <?php
-                // Get the weekly schedule
-                $weeklySchedule = $instructor ? $instructorModel->getWeeklySchedule($instructor['id']) : [];
+                // Use the prepared weekly schedule (from model or fallback)
                 $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                
+
                 foreach ($days as $day): 
-                    $hasClasses = !empty($weeklySchedule[$day]);
+                  $hasClasses = !empty($weeklySchedule[$day]);
                 ?>
                   <div class="schedule-day">
                     <div class="schedule-day-header"><?php echo $day; ?></div>
                     <div class="schedule-day-body">
                     <?php if ($hasClasses): ?>
-                      <?php foreach ($weeklySchedule[$day] as $class): ?>
+                      <?php
+                        $items = $weeklySchedule[$day];
+                        $visibleItems = array_slice($items, 0, 3);
+                        $hiddenCount = max(0, count($items) - count($visibleItems));
+                      ?>
+                      <?php foreach ($visibleItems as $class): ?>
                         <div class="schedule-item">
                           <div class="schedule-item-time"><?php echo htmlspecialchars($class['time']); ?></div>
                           <div class="schedule-item-subject"><?php echo htmlspecialchars($class['subject_name']); ?></div>
@@ -158,6 +201,9 @@ $todaysClassesCount = isset($weeklySchedule[$todayName]) ? count($weeklySchedule
                           </div>
                         </div>
                       <?php endforeach; ?>
+                      <?php if ($hiddenCount > 0): ?>
+                        <div class="schedule-more">+<?php echo $hiddenCount; ?> more</div>
+                      <?php endif; ?>
                     <?php else: ?>
                       <div class="no-classes">No classes scheduled</div>
                     <?php endif; ?>

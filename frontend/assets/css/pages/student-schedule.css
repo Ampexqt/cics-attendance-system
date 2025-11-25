@@ -5,6 +5,49 @@
     overflow: hidden;
 }
 
+/* Dashboard-specific compacting to show all days at a glance */
+.card.schedule-card {
+    overflow: visible; /* allow content to define height instead of scrolling */
+}
+
+.schedule-card .schedule-grid > * {
+    min-width: 0; /* prevent implicit min-widths causing horizontal scroll */
+}
+
+/* Make the schedule card take the full width of the dashboard grid so it has
+   enough room to display multiple columns without causing a horizontal scrollbar. */
+@media (min-width: 768px) {
+    .dashboard-grid .schedule-card {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Compact day cards inside dashboard so six days can fit vertically */
+.schedule-card .schedule-day {
+    min-height: auto;
+    padding: 0;
+    border-radius: var(--radius-md);
+}
+
+.schedule-card .schedule-day-header {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.85rem;
+}
+
+.schedule-card .schedule-day-body {
+    padding: 0.45rem;
+    gap: 0.35rem;
+}
+
+.schedule-card .class-item {
+    padding: 0.45rem;
+    font-size: 0.85rem;
+}
+
+.schedule-card .empty-day {
+    padding: 0.6rem 0.4rem;
+}
+
 .schedule-header {
     display: flex;
     align-items: center;
@@ -12,64 +55,106 @@
     margin-bottom: var(--spacing-md);
 }
 
+/* Use a grid layout that mirrors the instructor "Weekly Schedule" idea (structure only)
+   Keep colors and exact positioning untouched - rely on variables so palette stays consistent */
 .schedule-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(6, 1fr); /* Mon - Sat columns */
     gap: var(--spacing-md);
-    overflow-x: auto;
-    padding-bottom: var(--spacing-sm);
-    /* For scrollbar */
+    margin-top: var(--spacing-md);
 }
 
-/* For larger screens, force 5-6 columns if space permits, or use flex for a row layout */
-@media (min-width: 1024px) {
-    .schedule-grid {
-        grid-template-columns: repeat(5, 1fr);
-        /* Mon-Fri */
+/* Dashboard card variant: make the grid wrap into rows so it is not horizontally scrollable
+   and all days are visible at a glance. Adjust columns by breakpoint for readability. */
+.schedule-card .schedule-grid {
+    grid-template-columns: 1fr; /* stack by default to ensure visibility */
+    gap: var(--spacing-md);
+}
+
+@media (min-width: 900px) {
+    .schedule-card .schedule-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
+@media (min-width: 1200px) {
+    .schedule-card .schedule-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* For wide screens where there is enough horizontal room, show Mon-Sat in a single row
+   if the dashboard content column is wide enough. This preserves glance view on desktops. */
+@media (min-width: 1600px) {
+    .schedule-card .schedule-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+/* Tighter intermediate breakpoint: show 4 columns on wide desktops so days are visible
+   in two rows (3+3 or 4+2) without horizontal scroll on typical large monitors. */
+@media (min-width: 1400px) and (max-width: 1599px) {
+    .schedule-card .schedule-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Ensure internal grid items never force horizontal overflow */
+.schedule-card, .schedule-card * {
+    box-sizing: border-box;
+}
+.schedule-card .schedule-grid {
+    width: 100%;
+    min-width: 0;
+}
+
 .schedule-day {
-    background-color: var(--bg-secondary);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
-    min-width: 200px;
-    /* Ensure columns don't get too narrow */
+    background-color: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-light);
     display: flex;
     flex-direction: column;
+    min-height: 200px;
+    overflow: hidden;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.schedule-day:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
 }
 
 .schedule-day-header {
-    padding: var(--spacing-sm) var(--spacing-md);
-    background-color: var(--primary-blue);
-    color: white;
+    padding: var(--spacing-md);
+    background: linear-gradient(180deg, rgba(0,0,0,0.02), transparent);
+    color: var(--text-primary);
     font-weight: var(--font-weight-semibold);
     font-size: var(--font-size-sm);
     text-align: center;
-    border-top-left-radius: calc(var(--radius-md) - 1px);
-    border-top-right-radius: calc(var(--radius-md) - 1px);
+    border-bottom: 1px solid var(--border-light);
 }
 
 .schedule-day-body {
     padding: var(--spacing-sm);
-    flex: 1;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
+    flex: 1 1 auto;
+    overflow: hidden;
 }
 
 .class-item {
-    background-color: white;
-    border: 1px solid var(--border-color);
-    border-left: 3px solid var(--accent-gold);
+    background-color: var(--bg-secondary);
     border-radius: var(--radius-sm);
     padding: var(--spacing-sm);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.16s, box-shadow 0.16s;
+    border-left: 4px solid transparent;
 }
 
 .class-item:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-sm);
+    border-left-color: var(--primary-blue);
 }
 
 .class-time {
